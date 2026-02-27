@@ -1,0 +1,21 @@
+# Cluster outputs
+*.out
+*.err
+
+# for now, we wont push csv files due to storage issues
+*.csv 
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Common big artifacts
+*.pt
+*.pth
+*.ckpt
+*.pkl
+*.npy
+*.parquet

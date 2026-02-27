@@ -1,0 +1,41 @@
+Retrieving notices: ...working... done
+Channels:
+ - conda-forge
+ - defaults
+ - bioconda
+ - nvidia
+ - mordred-descriptor
+Platform: linux-64
+Collecting package metadata (repodata.json): ...working... done
+Solving environment: ...working... done
+
+## Package Plan ##
+
+  environment location: /home/gavrilev/.conda/envs/chemprop
+
+  added / updated specs:
+    - libstdcxx-ng
+
+
+The following packages will be downloaded:
+
+    package                    |            build
+    ---------------------------|-----------------
+    libgcc-15.2.0              |      he0feb66_18        1017 KB  conda-forge
+    libgcc-ng-15.2.0           |      h69a702a_18          27 KB  conda-forge
+    libgomp-15.2.0             |      he0feb66_18         589 KB  conda-forge
+    libstdcxx-15.2.0           |      h934c35e_18         5.6 MB  conda-forge
+    libstdcxx-ng-15.2.0        |      hdf11a46_18          27 KB  conda-forge
+    ------------------------------------------------------------
+                                           Total:         7.2 MB
+
+The following packages will be UPDATED:
+
+  libgcc                                  14.2.0-h77fa898_1 --> 15.2.0-he0feb66_18 
+  libgcc-ng                               14.2.0-h69a702a_1 --> 15.2.0-h69a702a_18 
+  libgomp                                 14.2.0-h77fa898_1 --> 15.2.0-he0feb66_18 
+  libstdcxx                               14.2.0-hc0a3c3a_1 --> 15.2.0-h934c35e_18 
+  libstdcxx-ng                            13.2.0-hc0a3c3a_7 --> 15.2.0-hdf11a46_18 
+
+
+Proceed ([y]/n)? 
