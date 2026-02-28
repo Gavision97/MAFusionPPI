@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 
 from utils.tools import custom_self_attention
-from MultiPPIMI.ABSMAFusionPPI import ABSMAFusionPPI
+from MAFusionPPI.ABSMAFusionPPI import ABSMAFusionPPI
 
 if torch.cuda.is_available():
     device = "cuda"
