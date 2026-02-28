@@ -9,7 +9,7 @@ import torch.optim as optim
 
 
 from utils.tools import *
-from MultiPPIMI.MAFusionPPI import MAFusionPPI
+from MAFusionPPI.MAFusionPPI import MAFusionPPI
 
 COLD_PATH = 'datasets/train_test_5_0.75'
 UNIPROT_MAPPING_PATH = 'datasets/idmapping_unip.tsv'
@@ -28,7 +28,7 @@ def avg_expirements_auc(dataframes, num_epochs_list, n):
             test_fold  = dataframes[f'test_{fold_name}_df']
             num_epochs = num_epochs_list[fold_num - 1]
 
-            model = MultiPPIMI(dropout=0.3).to(device)
+            model = MAFusionPPI(dropout=0.3).to(device)
 
             optimizer = optim.AdamW(model.parameters(), lr=1e-5, weight_decay=1e-3)
             criterion = nn.BCEWithLogitsLoss()

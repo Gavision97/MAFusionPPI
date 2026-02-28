@@ -1,14 +1,11 @@
 
 import os
 import logging
+logger = logging.getLogger(__name__) # get logger name
 
 import torch
-
 import torch.nn as nn
-
-from rdkit import Chem
-from rdkit.Chem.Scaffolds import MurckoScaffold
-import numpy as np
+import matplotlib.pyplot as plt
 
 
 if torch.cuda.is_available():
@@ -27,37 +24,32 @@ def convert_uniprot_ids(dataset, mapping_df):
     dataset['uniprot_id2'] = dataset['uniprot_id2'].map(mapping_dict)
     return dataset.drop_duplicates()
 
-def murcko_scaffold(smiles: str) -> str:
-    mol = Chem.MolFromSmiles(smiles)
-    if mol is None:
-        return ""
-    return MurckoScaffold.MurckoScaffoldSmiles(mol=mol, includeChirality=False)
 
-def scaffold_split(df, smiles_col="smiles", frac_train=0.8, seed=0):
-    # group indices by scaffold
-    scaffolds = {}
-    for i, smi in enumerate(df[smiles_col].values):
-        scaf = murcko_scaffold(smi)
-        scaffolds.setdefault(scaf, []).append(i)
+def plot_train_val_auc(
+    train_values,
+    val_values,
+    matric='AUC',
+    save_path=None,
+    title="Loss Curve"
+):
+    steps = range(len(train_values))
 
-    # sort scaffold groups by size (largest first), deterministic shuffle on ties
-    rng = np.random.RandomState(seed)
-    scaffold_sets = list(scaffolds.values())
-    rng.shuffle(scaffold_sets)
-    scaffold_sets.sort(key=len, reverse=True)
+    plt.figure(figsize=(10, 6))
+    plt.plot(steps, train_values, label=f"Training {matric}", linewidth=2, color="blue")
+    plt.plot(steps, val_values, label=f"Validation {matric}", linewidth=2, color="green")
 
-    n_total = len(df)
-    n_train = int(frac_train * n_total)
+    plt.title(title, fontsize=16)
+    plt.xlabel("Training Steps", fontsize=14)
+    plt.ylabel("Loss", fontsize=14)
 
-    train_idx, val_idx = [], []
-    for sset in scaffold_sets:
-        if len(train_idx) + len(sset) <= n_train:
-            train_idx.extend(sset)
-        else:
-            val_idx.extend(sset)
+    plt.grid(True, alpha=0.4)
+    plt.legend(fontsize=12)
+    plt.tight_layout()
 
-    return df.iloc[train_idx].copy(), df.iloc[val_idx].copy()
+    if save_path is not None:
+        plt.savefig(save_path, dpi=300)
 
+    plt.show()
 
 
 class custom_self_attention(nn.Module):
