@@ -1,0 +1,5 @@
+2026-03-01 14:38:57,696 - 01/03 - cold start evaluation @ negative factor=2, smoothing factor=1.0
+2026-03-01 14:38:57,696 - --- Start Cold Start Experiments for Dataset -> dataset_neg_fct_2_smoo_fct_1.0 ---
+2026-03-01 14:38:57,696 - --- Executing CV with scaffold split with hyperparameters of neg_factor=2 & smoo_factor=1.0 ...
+2026-03-01 14:38:57,696 - fold number=1
+2026-03-01 14:38:57,768 - MultiPPIMI model with self, with mlps after flatten

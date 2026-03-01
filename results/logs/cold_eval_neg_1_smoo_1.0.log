@@ -1,0 +1,21 @@
+2026-03-01 14:32:53,876 - 01/03 - cold start evaluation @ negative factor=1, smoothing factor=1.0 
+2026-03-01 14:32:53,877 - --- Start Cold Start Experiments for Dataset -> dataset_neg_fct_1_smoo_fct_1.0 ---
+2026-03-01 14:32:53,877 - --- Executing CV with scaffold split with hyperparameters of neg_factor=1 & smoo_factor=1.0 ...
+2026-03-01 14:32:53,877 - fold number=1
+2026-03-01 14:32:53,966 - MultiPPIMI model with self, with mlps after flatten
+2026-03-01 14:33:06,444 - Initializing MoleculeDataset !
+2026-03-01 14:33:21,221 - Initializing MoleculeDataset !
+2026-03-01 14:33:27,760 - --- train loader size -> 17802, val loader size 4451
+2026-03-01 14:33:51,724 - NEW BEST @ epoch 1: train_auc=0.5839, val_auc=0.6068, val_aupr=0.6533, val_precision=0.7826, val_sensitivity=0.2688; val_specificity=0.9307
+2026-03-01 14:34:15,210 - NEW BEST @ epoch 2: train_auc=0.7527, val_auc=0.7838, val_aupr=0.7788, val_precision=0.8004, val_sensitivity=0.3742; val_specificity=0.9133
+2026-03-01 14:34:38,494 - NEW BEST @ epoch 3: train_auc=0.8587, val_auc=0.8362, val_aupr=0.8220, val_precision=0.7852, val_sensitivity=0.4657; val_specificity=0.8817
+2026-03-01 14:35:01,827 - NEW BEST @ epoch 4: train_auc=0.9007, val_auc=0.8757, val_aupr=0.8645, val_precision=0.8152, val_sensitivity=0.5968; val_specificity=0.8744
+2026-03-01 14:35:25,157 - NEW BEST @ epoch 5: train_auc=0.9251, val_auc=0.9001, val_aupr=0.8907, val_precision=0.8146, val_sensitivity=0.7359; val_specificity=0.8445
+2026-03-01 14:35:48,464 - NEW BEST @ epoch 6: train_auc=0.9420, val_auc=0.9134, val_aupr=0.9046, val_precision=0.8399, val_sensitivity=0.7420; val_specificity=0.8687
+2026-03-01 14:36:12,757 - NEW BEST @ epoch 7: train_auc=0.9549, val_auc=0.9288, val_aupr=0.9195, val_precision=0.8718, val_sensitivity=0.7490; val_specificity=0.8977
+2026-03-01 14:36:35,891 - NEW BEST @ epoch 8: train_auc=0.9634, val_auc=0.9364, val_aupr=0.9279, val_precision=0.8540, val_sensitivity=0.8325; val_specificity=0.8679
+2026-03-01 14:36:59,625 - NEW BEST @ epoch 9: train_auc=0.9704, val_auc=0.9385, val_aupr=0.9301, val_precision=0.8611, val_sensitivity=0.8213; val_specificity=0.8769
+2026-03-01 14:37:23,208 - NEW BEST @ epoch 10: train_auc=0.9757, val_auc=0.9409, val_aupr=0.9328, val_precision=0.8596, val_sensitivity=0.8259; val_specificity=0.8748
+2026-03-01 14:37:46,615 - NEW BEST @ epoch 11: train_auc=0.9789, val_auc=0.9482, val_aupr=0.9411, val_precision=0.8765, val_sensitivity=0.8315; val_specificity=0.8912
+2026-03-01 14:38:09,871 - NEW BEST @ epoch 12: train_auc=0.9819, val_auc=0.9494, val_aupr=0.9424, val_precision=0.8534, val_sensitivity=0.8908; val_specificity=0.8579
+2026-03-01 14:38:32,868 - NEW BEST @ epoch 13: train_auc=0.9841, val_auc=0.9524, val_aupr=0.9461, val_precision=0.8714, val_sensitivity=0.8731; val_specificity=0.8804

@@ -73,7 +73,7 @@ class EarlyStopping:
             self.best_score = score
             # store best metrics (auc, aupr, precision, sensitivity & specificity)
             self.best_metrics[0], self.best_metrics[1], self.best_metrics[2], self.best_metrics[3], self.best_metrics[4] = metrics[0], metrics[1], metrics[2], metrics[3], metrics[4]
-            self.best_epoch = epoch
+            self.best_epoch = epoch+1
             self.no_improvement = 0
             logger.info(f"NEW BEST @ epoch {epoch+1}: train_auc={train_score:.4f}, val_auc={self.best_score:.4f}, "
                     f"val_aupr={self.best_metrics[1]:.4f}, val_precision={self.best_metrics[2]:.4f}, val_sensitivity={self.best_metrics[3]:.4f}; val_specificity={self.best_metrics[4]:.4f}")
@@ -85,37 +85,3 @@ class EarlyStopping:
                 self.stop_training = True
                 if self.verbose:
                     logger.info(f"Early stop at {epoch+1}. Best AUC={self.best_score} @ {self.best_epoch+1}")
-
-
-def murcko_scaffold(smiles: str) -> str:
-    mol = Chem.MolFromSmiles(smiles)
-    if mol is None:
-        return ""
-    return MurckoScaffold.MurckoScaffoldSmiles(mol=mol, includeChirality=False)
-
-
-def scaffold_split(df, smiles_col="smiles", frac_train=0.8, seed=42):
-    # group indices by scaffold
-    scaffolds = {}
-    for i, smi in enumerate(df[smiles_col].values):
-        scaf = murcko_scaffold(smi)
-        scaffolds.setdefault(scaf, []).append(i)
-
-    # sort scaffold groups by size (largest first), deterministic shuffle on ties
-    rng = np.random.RandomState(seed)
-    scaffold_sets = list(scaffolds.values())
-    rng.shuffle(scaffold_sets)
-    scaffold_sets.sort(key=len, reverse=True)
-
-    n_total = len(df)
-    n_train = int(frac_train * n_total)
-
-    train_idx, val_idx = [], []
-    for sset in scaffold_sets:
-        if len(train_idx) + len(sset) <= n_train:
-            train_idx.extend(sset)
-        else:
-            val_idx.extend(sset)
-
-    return df.iloc[train_idx].copy(), df.iloc[val_idx].copy()
-

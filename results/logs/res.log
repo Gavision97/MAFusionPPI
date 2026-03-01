@@ -8,3 +8,61 @@
 2026-02-28 20:43:28,193 - --- train loader size -> 17802, val loader size 4451
 2026-02-28 20:45:01,251 - NEW BEST @ epoch 1: train_auc=0.5913, val_auc=0.5586, val_aupr=0.6299, val_precision=0.6549, val_sensitivity=0.3383; val_specificity=0.8345
 2026-02-28 20:46:30,901 - NEW BEST @ epoch 2: train_auc=0.7382, val_auc=0.7773, val_aupr=0.7828, val_precision=0.8349, val_sensitivity=0.3798; val_specificity=0.9302
+2026-03-01 11:51:58,017 - log message
+2026-03-01 11:51:58,017 - --- Start Cold Start Experiments for Dataset -> dataset_neg_fct_1_smoo_fct_1.0 ---
+2026-03-01 11:51:58,017 - --- Executing CV with scaffold split with hyperparameters of neg_factor=1 & smoo_factor=1.0 ...
+2026-03-01 11:51:58,018 - fold number=1
+2026-03-01 11:51:58,074 - MultiPPIMI model with self, with mlps after flatten
+2026-03-01 11:52:10,842 - Initializing MoleculeDataset !
+2026-03-01 11:52:26,190 - Initializing MoleculeDataset !
+2026-03-01 11:52:32,935 - --- train loader size -> 17802, val loader size 4451
+2026-03-01 11:54:02,361 - NEW BEST @ epoch 1: train_auc=0.5976, val_auc=0.5539, val_aupr=0.6324, val_precision=0.8062, val_sensitivity=0.2776; val_specificity=0.9380
+2026-03-01 11:55:31,493 - NEW BEST @ epoch 2: train_auc=0.7542, val_auc=0.7564, val_aupr=0.7609, val_precision=0.8335, val_sensitivity=0.3411; val_specificity=0.9367
+2026-03-01 11:57:00,652 - NEW BEST @ epoch 3: train_auc=0.8490, val_auc=0.8272, val_aupr=0.8172, val_precision=0.8058, val_sensitivity=0.4181; val_specificity=0.9064
+2026-03-01 11:58:31,381 - NEW BEST @ epoch 4: train_auc=0.8969, val_auc=0.8497, val_aupr=0.8381, val_precision=0.8106, val_sensitivity=0.4914; val_specificity=0.8934
+2026-03-01 12:00:00,773 - NEW BEST @ epoch 5: train_auc=0.9234, val_auc=0.8782, val_aupr=0.8682, val_precision=0.8328, val_sensitivity=0.5833; val_specificity=0.8912
+2026-03-01 12:00:00,773 - Train the model for -> 4, best validation auc: 0.87823
+2026-03-01 12:07:04,066 - log message
+2026-03-01 12:07:04,066 - --- Start Cold Start Experiments for Dataset -> dataset_neg_fct_1_smoo_fct_1.0 ---
+2026-03-01 12:07:04,066 - --- Executing CV with scaffold split with hyperparameters of neg_factor=1 & smoo_factor=1.0 ...
+2026-03-01 12:07:04,066 - fold number=1
+2026-03-01 12:07:04,099 - MultiPPIMI model with self, with mlps after flatten
+2026-03-01 12:07:16,389 - Initializing MoleculeDataset !
+2026-03-01 12:07:25,099 - Initializing MoleculeDataset !
+2026-03-01 12:07:31,784 - --- train loader size -> 17802, val loader size 4451
+2026-03-01 12:08:59,766 - NEW BEST @ epoch 1: train_auc=0.5995, val_auc=0.5828, val_aupr=0.6379, val_precision=0.7057, val_sensitivity=0.3234; val_specificity=0.8748
+2026-03-01 12:10:31,108 - NEW BEST @ epoch 2: train_auc=0.7508, val_auc=0.7850, val_aupr=0.7853, val_precision=0.8049, val_sensitivity=0.4004; val_specificity=0.9099
+2026-03-01 12:10:31,108 - Train the model for -> 2, best validation auc: 0.78504
+2026-03-01 12:10:31,701 - --- Saved train vs. val AUC curves to results/plots/neg_fct_1_smoo_fct_1.0/neg_fct_1_smoo_fct_1.0_fold_2.png successfullys
+2026-03-01 12:10:31,701 - fold number=2
+2026-03-01 12:10:31,764 - MultiPPIMI model with self, with mlps after flatten
+2026-03-01 12:10:44,890 - Initializing MoleculeDataset !
+2026-03-01 12:10:53,969 - Initializing MoleculeDataset !
+2026-03-01 12:11:00,946 - --- train loader size -> 19453, val loader size 4864
+2026-03-01 12:12:41,540 - NEW BEST @ epoch 1: train_auc=0.5855, val_auc=0.5793, val_aupr=0.6568, val_precision=0.7760, val_sensitivity=0.3421; val_specificity=0.9092
+2026-03-01 12:14:21,579 - NEW BEST @ epoch 2: train_auc=0.7417, val_auc=0.7358, val_aupr=0.7546, val_precision=0.7791, val_sensitivity=0.4056; val_specificity=0.8942
+2026-03-01 12:14:21,579 - Train the model for -> 2, best validation auc: 0.73578
+2026-03-01 12:14:22,234 - --- Saved train vs. val AUC curves to results/plots/neg_fct_1_smoo_fct_1.0/neg_fct_1_smoo_fct_1.0_fold_3.png successfullys
+2026-03-01 12:14:22,235 - fold number=3
+2026-03-01 12:14:22,287 - MultiPPIMI model with self, with mlps after flatten
+2026-03-01 12:14:34,177 - Initializing MoleculeDataset !
+2026-03-01 12:14:42,766 - Initializing MoleculeDataset !
+2026-03-01 12:14:49,595 - --- train loader size -> 18676, val loader size 4670
+2026-03-01 12:16:30,212 - NEW BEST @ epoch 1: train_auc=0.5714, val_auc=0.5933, val_aupr=0.6469, val_precision=0.7653, val_sensitivity=0.2432; val_specificity=0.9264
+2026-03-01 12:18:08,956 - NEW BEST @ epoch 2: train_auc=0.6964, val_auc=0.7506, val_aupr=0.7755, val_precision=0.8409, val_sensitivity=0.3601; val_specificity=0.9328
+2026-03-01 12:18:08,956 - Train the model for -> 2, best validation auc: 0.75060
+2026-03-01 12:18:09,552 - --- Saved train vs. val AUC curves to results/plots/neg_fct_1_smoo_fct_1.0/neg_fct_1_smoo_fct_1.0_fold_4.png successfullys
+2026-03-01 12:18:09,552 - fold number=4
+2026-03-01 12:18:09,595 - MultiPPIMI model with self, with mlps after flatten
+2026-03-01 12:18:18,485 - Initializing MoleculeDataset !
+2026-03-01 12:18:26,633 - Initializing MoleculeDataset !
+2026-03-01 12:18:33,193 - --- train loader size -> 13908, val loader size 3477
+2026-03-01 12:19:48,228 - NEW BEST @ epoch 1: train_auc=0.5755, val_auc=0.6356, val_aupr=0.5937, val_precision=0.5994, val_sensitivity=0.3193; val_specificity=0.7867
+2026-03-01 12:21:04,129 - NEW BEST @ epoch 2: train_auc=0.6738, val_auc=0.7414, val_aupr=0.7119, val_precision=0.6814, val_sensitivity=0.4356; val_specificity=0.7964
+2026-03-01 12:21:04,130 - Train the model for -> 2, best validation auc: 0.74135
+2026-03-01 12:21:04,617 - --- Saved train vs. val AUC curves to results/plots/neg_fct_1_smoo_fct_1.0/neg_fct_1_smoo_fct_1.0_fold_5.png successfullys
+2026-03-01 12:21:04,617 - fold number=5
+2026-03-01 12:21:04,670 - MultiPPIMI model with self, with mlps after flatten
+2026-03-01 12:21:15,730 - Initializing MoleculeDataset !
+2026-03-01 12:21:24,271 - Initializing MoleculeDataset !
+2026-03-01 12:21:31,719 - --- train loader size -> 16130, val loader size 4033

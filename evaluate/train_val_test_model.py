@@ -6,18 +6,21 @@ import torch
 import pandas as pd
 import torch.nn as nn
 import torch.optim as optim
+from torch.utils.data import Dataset, DataLoader, Subset
 
+import numpy as np
+from sklearn.utils import resample
 
 from utils.tools import *
+from utils.eval_tools import calc_metrics
+from utils.splitters import CustomButinaSplitter
 from utils.MoleculeDataset import MoleculeDataset
-from MultiPPIMI.MAFusionPPI import MAFusionPPI
+from MAFusionPPI.MAFusionPPI import MAFusionPPI
 
 
 
 UNIPROT_MAPPING_PATH = 'datasets/idmapping_unip.tsv'
-
-
-from CustomButinaSplitter import *
+TRUE_THRESHOLD = 0.5
 
 def train_val_test_model(dataset, num_epochs, dropout, lr, weight_decay, criterion, 
                          batch_size=32, device='cuda', num_workers=5):
@@ -32,9 +35,8 @@ def train_val_test_model(dataset, num_epochs, dropout, lr, weight_decay, criteri
     splits = butinaSplitter.split_dataset(dataset)
             
     for fold_number, (train_subset, val_subset, test_subset) in enumerate(splits, 1):
-        PRINTC()
-        logging.info(f"fold number {fold_number}")
-        PRINTC()
+        logger.info(f"fold number {fold_number}")
+ 
         train_df, val_df, test_df = train_subset, val_subset, test_subset
         test_dataset = MoleculeDataset(test_df)
         test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
@@ -48,10 +50,9 @@ def train_val_test_model(dataset, num_epochs, dropout, lr, weight_decay, criteri
             early_stopping_patience = 5
             best_model_state_dict = None
             
-            logging.info(f"bootsrap number: {bootsrap + 1}")
-            model = generate_model(batch_size=batch_size, dropout=dropout)
+            logger.info(f"bootsrap number: {bootsrap + 1}")
+            model = MAFusionPPI(dropout=dropout)
             optimizer = optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
-            PRINTC()
             
             seed_train = fold_number*1000 + bootsrap + 1
             labels_list = train_df['label'].values
@@ -90,16 +91,9 @@ def train_val_test_model(dataset, num_epochs, dropout, lr, weight_decay, criteri
                     all_labels.extend(batch_labels.cpu().numpy())
                     all_preds.extend(outputs.squeeze().detach().cpu().numpy())
                     
-                # Compute training metrics
-                train_auc = roc_auc_score(all_labels, all_preds)
-                train_aupr = average_precision_score(all_labels, all_preds)
-                predicted_classes = (np.array(all_preds) >= 0.5).astype(int)
-                cm = confusion_matrix(all_labels, predicted_classes)
-                TN, FP, FN, TP = cm.ravel()
-                train_sensitivity = TP / (TP + FN) if (TP + FN) > 0 else 0
-                train_specificity = TN / (TN + FP) if (TN + FP) > 0 else 0
-                train_precision = TP / (TP + FP) if (TP + FP) > 0 else 0
-                        
+                # compute training metrics
+                train_metrics_dict = calc_metrics(ys_true=all_labels, ys_pred=all_preds, true_threshold=TRUE_THRESHOLD)
+                                 
                 # Evaluate the model on the validation set
                 all_val_labels = []
                 all_val_outputs = []
@@ -156,7 +150,7 @@ def train_val_test_model(dataset, num_epochs, dropout, lr, weight_decay, criteri
                 mean_val_precision = np.mean(current_b_precisions)
                 end_time = time.time()
                 epoch_time = (end_time - start_time) / 60
-                logging.info(f'Epoch {epoch+1}/{num_epochs}, Loss: {(epoch_loss/len(train_loader)):.4f}, '
+                logger.info(f'Epoch {epoch+1}/{num_epochs}, Loss: {(epoch_loss/len(train_loader)):.4f}, '
                             f'Train AUC: {train_auc:.4f}, Train AUPR: {train_aupr:.4f}, '
                             f'Train Sensitivity: {train_sensitivity:.4f}, Train Specificity: {train_specificity:.4f}, '
                             f'Train Precision: {train_precision:.4f}, '
@@ -175,7 +169,7 @@ def train_val_test_model(dataset, num_epochs, dropout, lr, weight_decay, criteri
                     epochs_without_improvement += 1
 
                 if epochs_without_improvement >= early_stopping_patience:
-                    logging.info("Early stopping triggered")
+                    logger.info("Early stopping triggered")
                     break
                     
             # Load the best model in order to evaluate it on the test set
@@ -234,7 +228,7 @@ def train_val_test_model(dataset, num_epochs, dropout, lr, weight_decay, criteri
             mean_test_sensitivity = np.mean(current_b_sensitivities)
             mean_test_specificity = np.mean(current_b_specificities)
             mean_test_precision = np.mean(current_b_precisions)
-            logging.info(f'Bootstrap {bootsrap}, Mean Test AUC: {mean_test_auc:.4f}, Mean Test AUPR: {mean_test_aupr:.4f}, '
+            logger.info(f'Bootstrap {bootsrap}, Mean Test AUC: {mean_test_auc:.4f}, Mean Test AUPR: {mean_test_aupr:.4f}, '
                         f'Mean Test Sensitivity: {mean_test_sensitivity:.4f}, Mean Test Specificity: {mean_test_specificity:.4f}, '
                         f'Mean Test Precision: {mean_test_precision:.4f}')
 
@@ -269,8 +263,8 @@ def train_val_test_model(dataset, num_epochs, dropout, lr, weight_decay, criteri
             'specificity': np.mean([m['specificity'] for m in bootstrap_test_metrics]),
             'precision': np.mean([m['precision'] for m in bootstrap_test_metrics])
         }
-        logging.info(f"Fold {fold_number} Mean Validation Metrics: {current_fold_mean_valid_metrics}")
-        logging.info(f"Fold {fold_number} Mean Test Metrics: {current_fold_mean_test_metrics}")
+        logger.info(f"Fold {fold_number} Mean Validation Metrics: {current_fold_mean_valid_metrics}")
+        logger.info(f"Fold {fold_number} Mean Test Metrics: {current_fold_mean_test_metrics}")
         all_folds_valid_metrics.append(current_fold_mean_valid_metrics)
         all_folds_test_metrics.append(current_fold_mean_test_metrics)
     
@@ -290,8 +284,8 @@ def train_val_test_model(dataset, num_epochs, dropout, lr, weight_decay, criteri
         'precision': np.mean([m['precision'] for m in all_folds_test_metrics])
     }
 
-    PRINTC()               
-    logging.info(f"Final Mean Validation Metrics across all folds: {final_mean_valid_metrics}")
-    logging.info(f"Validation Metrics for all folds: {all_folds_valid_metrics}")
-    logging.info(f"Final Mean Test Metrics across all folds: {final_mean_test_metrics}")
-    logging.info(f"Test Metrics for all folds: {all_folds_test_metrics}")
+              
+    logger.info(f"Final Mean Validation Metrics across all folds: {final_mean_valid_metrics}")
+    logger.info(f"Validation Metrics for all folds: {all_folds_valid_metrics}")
+    logger.info(f"Final Mean Test Metrics across all folds: {final_mean_test_metrics}")
+    logger.info(f"Test Metrics for all folds: {all_folds_test_metrics}")

@@ -1,0 +1,13 @@
+2026-03-01 14:35:30,363 - 01/03 - cold start evaluation @ negative factor=2, smoothing factor=0.75
+2026-03-01 14:35:30,363 - --- Start Cold Start Experiments for Dataset -> dataset_neg_fct_2_smoo_fct_0.75 ---
+2026-03-01 14:35:30,364 - --- Executing CV with scaffold split with hyperparameters of neg_factor=2 & smoo_factor=0.75 ...
+2026-03-01 14:35:30,364 - fold number=1
+2026-03-01 14:35:30,430 - MultiPPIMI model with self, with mlps after flatten
+2026-03-01 14:35:47,842 - Initializing MoleculeDataset !
+2026-03-01 14:35:58,790 - Initializing MoleculeDataset !
+2026-03-01 14:36:05,738 - --- train loader size -> 26456, val loader size 6614
+2026-03-01 14:36:38,709 - NEW BEST @ epoch 1: train_auc=0.6564, val_auc=0.6378, val_aupr=0.5500, val_precision=0.4845, val_sensitivity=0.3587; val_specificity=0.8073
+2026-03-01 14:37:11,554 - NEW BEST @ epoch 2: train_auc=0.8057, val_auc=0.7825, val_aupr=0.6890, val_precision=0.6538, val_sensitivity=0.4741; val_specificity=0.8733
+2026-03-01 14:37:43,919 - NEW BEST @ epoch 3: train_auc=0.8843, val_auc=0.8418, val_aupr=0.7534, val_precision=0.7412, val_sensitivity=0.5214; val_specificity=0.9081
+2026-03-01 14:38:17,849 - NEW BEST @ epoch 4: train_auc=0.9200, val_auc=0.8754, val_aupr=0.7996, val_precision=0.7903, val_sensitivity=0.5773; val_specificity=0.9226
+2026-03-01 14:38:52,122 - NEW BEST @ epoch 5: train_auc=0.9415, val_auc=0.8975, val_aupr=0.8297, val_precision=0.7843, val_sensitivity=0.6471; val_specificity=0.9101

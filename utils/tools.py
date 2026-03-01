@@ -24,13 +24,32 @@ def convert_uniprot_ids(dataset, mapping_df):
     dataset['uniprot_id2'] = dataset['uniprot_id2'].map(mapping_dict)
     return dataset.drop_duplicates()
 
+def create_dataframes_dict(smiles_list, ppi_list):
+    ppi_dict = {}
+
+    for uniprot_id1, uniprot_id2 in ppi_list:
+        key = f"{uniprot_id1}_{uniprot_id2}"
+        
+        # generate DataFrame for this ppi
+        df = pd.DataFrame({
+            "smiles": smiles_list, 
+            "uniprot_id1": [uniprot_id1] * len(smiles_list),
+            "uniprot_id2": [uniprot_id2] * len(smiles_list),
+            "label": [-1] * len(smiles_list)
+        })
+        ppi_dict[key] = df
+        
+    return ppi_dict
+
 
 def plot_train_val_auc(
     train_values,
     val_values,
     matric='AUC',
     save_path=None,
-    title="Loss Curve"
+    title="Loss Curve",
+    xlabel="Training Steps",
+    ylabel="Loss"
 ):
     steps = range(len(train_values))
 
@@ -39,8 +58,8 @@ def plot_train_val_auc(
     plt.plot(steps, val_values, label=f"Validation {matric}", linewidth=2, color="green")
 
     plt.title(title, fontsize=16)
-    plt.xlabel("Training Steps", fontsize=14)
-    plt.ylabel("Loss", fontsize=14)
+    plt.xlabel(xlabel, fontsize=14)
+    plt.ylabel(ylabel, fontsize=14)
 
     plt.grid(True, alpha=0.4)
     plt.legend(fontsize=12)

@@ -9,6 +9,7 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 
 import os
 import json
+import pickle
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -20,7 +21,10 @@ logger = logging.getLogger(__name__)
 
 from evaluate.train_test_cold_start_ppi import train_test_cold_start_ppi
 from evaluate.cold_neg_smoo_eval import cold_neg_smoo_eval
+from evaluate.mcd_eval import mcd_eval
 
+PPI_DICT_PATH = 'saved_obj/ppi_dict.pkl'
+PPI_DFS_DICT_PATH = "saved_obj/enamine_ppi_dfs_dict.pkl"
 
 def cold_neg_smoo_eval_(
     res_file_name: str = "cv_cold_neg_smoo_results",
@@ -74,18 +78,44 @@ def cold_neg_smoo_eval_(
 
     return res_dict, val_metrics_dict
 
+
+def mcd_eval_(exp_name='Enamine', smiles_column='smiles'):
+
+    # load PPI partition dictionary & PPI dataframe dictionary 
+    with open(PPI_DICT_PATH, "rb") as f:
+        ppi_partiton_dict = pickle.load(f)
+    with open(PPI_DFS_DICT_PATH, "rb") as f:
+        ppi_dict = pickle.load(f)
+
+    logger.info(f'PPI pair set length -> {len(list(ppi_dict.keys()))}')
+
+    df = pd.read_csv(f'datasets/mcd/{exp_name}.csv')
+    smiles_df = df[[smiles_column]]
+    logging.info(f'number of smiles -> {smiles_df.shape[0]}')
+    output_directory = "./mc_dropout_results_enamine"
+
+    # execute monte carlo dropout evaluation 
+    mcd_eval(
+        ppi_partition_number=1,
+        ppi_dict=ppi_dict,
+        ppi_partiton_dict = ppi_partiton_dict,
+        smiles_df=smiles_df,
+        output_dir=output_directory,
+    )
+
+
+
 def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--log_msg", type=str, default='log message', help="First message to display in the log file; for experiment description")
     parser.add_argument("--res_file_name", type=str, default='res', help="name of the result; pandas.DataFrame() object")
-    parser.add_argument("--eval_method", type=str, default='cv_neg_smoo', choices=['cv','cv_neg_smoo' 'cold'], help="path to the smiles file")
+    parser.add_argument("--eval_method", type=str, default='cv_neg_smoo', choices=['cv','cv_neg_smoo', 'cold', "mcd"], help="path to the smiles file")
     parser.add_argument("--cv_method", type=str, default='all', choices=['all', 'per_fam'], help="The split for 10-fold cross-validation - all data or per RNA subtype ")
-    parser.add_argument('--cv_neg_factor', type=str, default='1', choices=['1.0', '2', '3', '4', '5'], help="negative sampling hyperparameter (e.g., 1, 2 ... 5)")
-    parser.add_argument('--cv_smoo_factor', type=str, default='1.0', choices=['0.75', '0.8', '0.9', '0.95', '1.0'], help="")
-    parser.add_argument("--plot_name", type=str, default='loss_curve', help="loss curve plot name; will be saved to results/plots/plot_name.png")
+    parser.add_argument('--neg_factor', type=str, default='1', choices=['1', '2', '3', '4', '5'], help="negative sampling hyperparameter (e.g., 1, 2 ... 5)")
+    parser.add_argument('--smoo_factor', type=str, default='1.0', choices=['0.75', '0.8', '0.9', '0.95', '1.0'], help="")
+    parser.add_argument('--n_exp', type=int, default=10, help="number of experiments for statistically significant evaluation")
     parser.add_argument("--log_file_name", type=str, default="res", help="name of the logger file (e.g., result.log)")
-    parser.add_argument("--k_fold", type=int,  default=5, help="Number of folds for stratified K-fold cross-validation (default: 10)")
     parser.add_argument("--device", type=str, default='cuda', choices=['cuda', 'cpu'], help="device to use - cuda/cpu")
     args = parser.parse_args()
 
@@ -94,10 +124,9 @@ def main():
     res_file_name = args.res_file_name
     log_file_name = args.log_file_name
     eval_method= args.eval_method
-    cv_neg_factor = args.cv_neg_factor
-    cv_smoo_factor = args.cv_smoo_factor
-    plot_name = args.plot_name
-    k_fold = args.k_fold
+    neg_factor = args.neg_factor
+    smoo_factor = args.smoo_factor
+    n_exp = args.n_exp
     device = args.device
 
 
@@ -111,9 +140,11 @@ def main():
     
     logger.info(log_msg)
     if eval_method == 'cold':
-        train_test_cold_start_ppi()
+        pass # # TODO: finish building cold eval pipeline & test it
     elif eval_method =='cv_neg_smoo':
-        cold_neg_smoo_eval_(neg_factor=cv_neg_factor, smoo_factor=cv_smoo_factor, res_file_name=res_file_name, device=device)
+        cold_neg_smoo_eval_(neg_factor=neg_factor, smoo_factor=smoo_factor, res_file_name=res_file_name, n=n_exp, device=device)
+    elif eval_method == 'mcd':
+        pass # TODO: finish building mcd pipeline & test it
 
 
 if __name__ == "__main__":

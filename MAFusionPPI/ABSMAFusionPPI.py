@@ -12,7 +12,8 @@ from torch.utils.data import DataLoader
 from sklearn.metrics import roc_auc_score
 
 
-from utils.eval_tools import EarlyStopping, scaffold_split, calc_metrics
+from utils.eval_tools import EarlyStopping, calc_metrics
+from utils.splitters import scaffold_split
 from utils.MoleculeDataset import MoleculeDataset
 
 
@@ -30,7 +31,7 @@ class ABSMAFusionPPI(ABC, nn.Module):
         self.true_threshold = 0.5 # same as state-of-the-art frameworks
 
         # early stopping hyperparameters
-        self.early_stopping_patience = 5
+        self.early_stopping_patience = 20
         self.warm_up_epochs = 10
         self.delta = 0.0001
 
@@ -55,13 +56,14 @@ class ABSMAFusionPPI(ABC, nn.Module):
                 y = y.to(device)
 
                 optimizer.zero_grad()
-                outputs = self(*inputs) 
-                loss = criterion(outputs.squeeze(), y)
-                
+                outputs = self(*inputs)
+                logits, targets = outputs.view(-1), y.view(-1).float()
+                loss = criterion(logits, targets)
+
                 train_loss += loss.item()
-                all_labels.extend(y.cpu().numpy())
-                all_outputs.extend(outputs.squeeze().detach().cpu().numpy())
-        
+                all_labels.extend(targets.detach().cpu().numpy())
+                all_outputs.extend(logits.detach().cpu().numpy())
+                        
                 loss.backward()
                 optimizer.step()
                         
@@ -88,55 +90,54 @@ class ABSMAFusionPPI(ABC, nn.Module):
 
         train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
         val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
-        logger.info(f'--- train loader size -> {len(train_dataset)}, val loader size {len(val_dataset)}')
+        logger.info(f'---- train loader size -> {len(train_dataset)}, val loader size {len(val_dataset)} ----')
 
         # custom early stopping object; in order to reduce risk of overfitting
         # on the validation set and improve model generalization ability
         early_stopping = EarlyStopping(mode='max', patience=self.early_stopping_patience,
                                        warm_up_epochs=self.warm_up_epochs, verbose=True)
-        
+
         for epoch in range(num_epochs):
             all_preds, all_labels = [], []
 
-            start_time = time.time()
             self.train()
-            running_loss = 0.0
+            #running_loss = 0.0
             for (inputs), y in train_loader:
                 inputs = [inp.to(device) for inp in inputs] # move all features & labels to device
                 y = y.to(device)
 
                 optimizer.zero_grad()
-                outputs = self(*inputs)                 
-                loss = criterion(outputs.squeeze(), y)
-                running_loss += loss.item()
+                outputs = self(*inputs)
+                logits, targets = outputs.view(-1), y.view(-1).float()
+                loss = criterion(logits, targets)
+
+                #running_loss += loss.item()
+                all_labels.extend(targets.detach().cpu().numpy())
+                all_preds.extend(logits.detach().cpu().numpy())
+
                 loss.backward()
                 optimizer.step()
-                all_labels.extend(y.cpu().numpy())
-                all_preds.extend(outputs.squeeze().detach().cpu().numpy())
             
             train_auc = roc_auc_score(all_labels, all_preds)
             val_metrics_dict, _ = self.validate_model(val_loader, criterion, device)
             curr_val_metrics = [val_metrics_dict['AUC'], val_metrics_dict['AUPR'], val_metrics_dict['Precision'],
                                 val_metrics_dict['Sensitivity'], val_metrics_dict['Specificity']]
             
-            train_aucs.append(train_aucs)
+            train_aucs.append(train_auc)
             val_aucs.append(val_metrics_dict['AUC'])
-            
-            end_time = time.time()
-            epoch_time = (end_time - start_time) / 60
-            
-            #logger.info(f"Epoch {epoch+1}/{num_epochs}, Train Loss: {(running_loss/len(train_loader)):.4f}, Val Loss: {val_loss:.4f}, Train AUC: {train_auc:.4f}, Validation AUC: {val_metrics_dict['AUC']:.4f}, Epoch Time: {epoch_time:.4f}")
             
             # early stopping step
             early_stopping.check_early_stop(val_metrics_dict['AUC'], curr_val_metrics
                                             ,train_auc, epoch)   
             if early_stopping.stop_training:
-                logger.info(f"[Fold {fold+1}/5] Early stopping at epoch {epoch+1}. "
+                logger.info(f"Early stopping at epoch {epoch+1}. "
                             f"Best rmse={early_stopping.best_score:.4f} @ epoch {early_stopping.best_epoch+1}")
-                train_epoch = early_stopping.best_epoch # extract the best epoch from early stopping process
+                train_epoch = early_stopping.best_epoch 
                 break
         
-        logger.info(f"Train the model for -> {train_epoch}, best validation auc: {early_stopping.best_metrics['AUC']:.5f}")
+        # extract the best epoch from early stopping process
+        train_epoch = early_stopping.best_epoch 
+        logger.info(f"Train the model for -> {train_epoch}, best validation auc: {early_stopping.best_metrics[0]:.5f}")
         
         # return number of epoch to train the model based on CV with scaffold split,
         # best epoch metrics (auc, aupr, etc ..), train aucs and val aucs
@@ -158,11 +159,12 @@ class ABSMAFusionPPI(ABC, nn.Module):
                 y = y.to(device)
     
                 outputs = self(*inputs)
-                loss = criterion(outputs.squeeze(), y)
+                logits, targets = outputs.view(-1), y.view(-1).float()
+                loss = criterion(logits, targets)
+
                 test_loss += loss.item()
-    
-                all_labels.extend(y.cpu().numpy())
-                all_outputs.extend(outputs.squeeze().cpu().numpy())
+                all_labels.extend(targets.detach().cpu().numpy())
+                all_outputs.extend(logits.detach().cpu().numpy())
     
   
         test_loss /= len(test_loader)
@@ -194,12 +196,13 @@ class ABSMAFusionPPI(ABC, nn.Module):
                 inputs = [inp.to(device) for inp in inputs]
                 y = y.to(device)
 
-                outputs = self(*inputs)                
-                loss = criterion(outputs.squeeze(), y)
-                val_loss += loss.item()
+                outputs = self(*inputs)
+                logits, targets = outputs.view(-1), y.view(-1).float()
+                loss = criterion(logits, targets)
 
-                all_labels.extend(y.cpu().numpy())
-                all_outputs.extend(outputs.squeeze().cpu().numpy())
+                val_loss += loss.item()
+                all_labels.extend(targets.detach().cpu().numpy())
+                all_outputs.extend(logits.detach().cpu().numpy())
 
         val_loss /= len(val_loader)
 

@@ -14,6 +14,13 @@ from MAFusionPPI.MAFusionPPI import MAFusionPPI
 COLD_PATH = 'datasets/train_test_5_0.75'
 UNIPROT_MAPPING_PATH = 'datasets/idmapping_unip.tsv'
 
+# best hyperparameters; extracted from ablation study & vast hyperparameter search
+LR = 1e-5
+WEIGHT_DECAY = 1e-3
+DROPOUT = 0.3
+BATCH_SIZE = 64
+NUM_WORKERS = 16
+
 def avg_expirements_auc(dataframes, num_epochs_list, n):
     logger.info('--- Start training! ---')
 
@@ -28,36 +35,25 @@ def avg_expirements_auc(dataframes, num_epochs_list, n):
             test_fold  = dataframes[f'test_{fold_name}_df']
             num_epochs = num_epochs_list[fold_num - 1]
 
-            model = MAFusionPPI(dropout=0.3).to(device)
+            model = MAFusionPPI(dropout=DROPOUT).to(device)
 
-            optimizer = optim.AdamW(model.parameters(), lr=1e-5, weight_decay=1e-3)
+            optimizer = optim.AdamW(model.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
             criterion = nn.BCEWithLogitsLoss()
 
-            model.train_model(
-                fold_name,
-                num_epochs=num_epochs,
-                dataset=train_fold,
-                optimizer=optimizer,
-                criterion=criterion,
-                batch_size=64,
-                device=device,
-                num_workers=16
-            )
+            model.train_model(fold_name, num_epochs=num_epochs, dataset=train_fold,
+                              optimizer=optimizer, criterion=criterion, batch_size=BATCH_SIZE,
+                              device=device, num_workers=NUM_WORKERS)
 
-            res_tuple = model.test_model(
-                test_fold,
-                criterion=criterion,
-                batch_size=64,
-                device=device,
-                num_workers=16
-            )
+            res_tuple = model.test_model(test_fold, criterion=criterion, batch_size=BATCH_SIZE, 
+                                         device=device, num_workers=NUM_WORKERS)
 
             res_dict[f'exp{exp_num}'].append(res_tuple)
 
     return res_dict
 
 
-def train_test_cold_start_ppi():
+def train_test_cold_start_ppi(nel = [50, 50, 50, 50, 50],
+                              n=10):
     # Train & test on cold start data
     uniprot_mapping = pd.read_csv(UNIPROT_MAPPING_PATH, delimiter="\t")
 
@@ -70,8 +66,6 @@ def train_test_cold_start_ppi():
     for df_name in dataframes:
         dataframes[df_name] = convert_uniprot_ids(dataframes[df_name], uniprot_mapping)
 
-    nel = [23, 32, 23, 54, 30]
-    n = 10
     ten_exp_res_dict = avg_expirements_auc(dataframes=dataframes, num_epochs_list=nel, n=n)
     
     logger.info('Done evaluating using cold start stetting, results:')
