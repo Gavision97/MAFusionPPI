@@ -1,4 +1,5 @@
 import os
+import copy
 import logging
 logger = logging.getLogger(__name__) # get logger name
 
@@ -31,16 +32,72 @@ def calc_metrics(ys_true, ys_pred, true_threshold=0.5):
     metric_dict = {'AUC': None, 'AUPR': None, 'Precision': None, 'Sensitivity': None, 'Specificity': None}
     metric_dict['AUC'] = roc_auc_score(ys_true, ys_pred)
     metric_dict['AUPR'] = average_precision_score(ys_true, ys_pred)
-    metric_dict['Precision'] = precision_score(ys_true, (np.array(ys_pred) > true_threshold).astype(int))
-    metric_dict['Sensitivity'] = recall_score(ys_true, (np.array(ys_pred) > true_threshold).astype(int))
+    metric_dict['Precision'] = precision_score(ys_true, (np.array(ys_pred) > true_threshold).astype(int), zero_division=0)
+    metric_dict['Sensitivity'] = recall_score(ys_true, (np.array(ys_pred) > true_threshold).astype(int), zero_division=0)
     
     tn, fp, _, _ = confusion_matrix(ys_true, (np.array(ys_pred) > true_threshold).astype(int)).ravel()
     metric_dict['Specificity'] = tn / (tn + fp)
 
     return metric_dict
 
-
 class EarlyStopping:
+    """
+    Early stopping based on a single score (e.g., AUC).
+    Stores best metrics + best model state_dict.
+    """
+    def __init__(self, mode="min", patience=20, warm_up_epochs=30, delta=0.0, verbose=False):
+        self.mode = mode
+        self.patience = patience
+        self.warm_up_epochs = warm_up_epochs
+        self.delta = delta
+        self.verbose = verbose
+
+        self.best_score = float("inf") if mode == "min" else -float("inf")
+        self.best_epoch = -1
+        self.no_improvement = 0
+        self.stop_training = False
+
+        # auc, aupr, precision, sensitivity, specificity
+        self.best_metrics = [float("-inf")] * 5
+
+        # NEW: store best weights
+        self.best_state_dict = None
+
+    def _is_improvement(self, score):
+        if self.mode == "min":
+            return score < self.best_score - self.delta
+        else:
+            return score > self.best_score + self.delta
+
+    def check_early_stop(self, score, metrics, train_score, epoch, model=None):
+        if self._is_improvement(score):
+            self.best_score = score
+            self.best_metrics = list(metrics)
+            self.best_epoch = epoch + 1
+            self.no_improvement = 0
+
+            if model is not None:
+                self.best_state_dict = copy.deepcopy(model.state_dict())
+
+            logger.info(
+                f"NEW BEST @ epoch {epoch+1}: train_auc={train_score:.4f}, val_auc={self.best_score:.4f}, "
+                f"val_aupr={self.best_metrics[1]:.4f}, val_precision={self.best_metrics[2]:.4f}, "
+                f"val_sensitivity={self.best_metrics[3]:.4f}; val_specificity={self.best_metrics[4]:.4f}"
+            )
+        else:
+            if epoch < self.warm_up_epochs:
+                return
+            self.no_improvement += 1
+            if self.no_improvement >= self.patience:
+                self.stop_training = True
+                if self.verbose:
+                    logger.info(
+                        f"Early stop at {epoch+1}. Best score={self.best_score} @ epoch {self.best_epoch}"
+                    )
+
+
+
+class EarlyStopping_:
     '''
     custom early stopping implementation (for that research, hardcoded with score setting => AUC)
     '''

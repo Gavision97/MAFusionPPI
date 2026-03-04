@@ -80,16 +80,23 @@ class MoleculeDataset(Dataset):
     @staticmethod
     def collate_fn(batch):
         """
-        batch: list of (inputs, y)
-        inputs is list of tensors. Stack each position across batch.
+        batch: list of (inputs, y, meta)
+        inputs: list of tensors/arrays (per feature type)
+        y: tensor scalar
+        meta: (smiles, uniprot1, uniprot2)
         """
-        inputs_list, ys = zip(*batch)          # tuple of lists, tuple of scalars/tensors
-        # transpose: from list-per-sample to list-per-feature
+        inputs_list, ys, metas = zip(*batch)      # metas is tuple of tuples
         features_by_type = list(zip(*inputs_list))
 
-        stacked_inputs = [torch.stack(feats, dim=0) for feats in features_by_type]
-        y = torch.stack(ys, dim=0)             # (B,)
-        return stacked_inputs, y
+        # ensure all are tensors
+        stacked_inputs = [
+            torch.stack([torch.as_tensor(f) for f in feats], dim=0)
+            for feats in features_by_type
+        ]
+        y = torch.stack(ys, dim=0)                # (B,)
+
+        smiles, uniprot1, uniprot2 = zip(*metas)  # each is length B tuple of strings
+        return stacked_inputs, y, (smiles, uniprot1, uniprot2)
 
     def make_loader(self, batch_size=32, shuffle=True, num_workers=0, pin_memory=True):
         return DataLoader(
@@ -105,7 +112,10 @@ class MoleculeDataset(Dataset):
         return len(self.data)
 
     def __getitem__(self, idx):
+        # smiles, uniprot_id1,uniprot_id2,label
         smiles = self.data.loc[idx, "smiles"]
+        uniprot1, uniprot2 = self.data.loc[idx, "uniprot_id1"], self.data.loc[idx, "uniprot_id2"]
+        meta = (smiles, uniprot1, uniprot2)
         y = torch.tensor(self.data.loc[idx, "label"], dtype=torch.float32)
 
         # PPI features (already aligned by idx because you built *_features_ppi using self.data order)
@@ -119,7 +129,7 @@ class MoleculeDataset(Dataset):
         chemberta = self.chemberta.loc[self.smiles_chemical_descriptors['SMILES'] == smiles].iloc[0, 1:].values.astype(np.float32)
 
         inputs = [chemprop, esm_features, fegs_features, gae_features, chemberta, morgan, chem_desc]
-        return inputs, y
+        return inputs, y, meta
 
 
 class MoleculeDataset__(Dataset):
