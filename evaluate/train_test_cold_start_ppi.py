@@ -66,10 +66,10 @@ def train_test_cold_start_ppi(nel = [50, 50, 50, 50, 50],
     for df_name in dataframes:
         dataframes[df_name] = convert_uniprot_ids(dataframes[df_name], uniprot_mapping)
 
-    ten_exp_res_dict = avg_expirements_auc(dataframes=dataframes, num_epochs_list=nel, n=n)
+    exp_res_dict = avg_expirements_auc(dataframes=dataframes, num_epochs_list=nel, n=n)
     
     logger.info('Done evaluating using cold start stetting, results:')
-    for exp, res_list in ten_exp_res_dict.items():
+    for exp, res_list in exp_res_dict.items():
         logger.info(f"{exp}: {res_list}")
 
 

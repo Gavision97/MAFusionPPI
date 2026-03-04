@@ -84,4 +84,4 @@ class EarlyStopping:
             if self.no_improvement >= self.patience:
                 self.stop_training = True
                 if self.verbose:
-                    logger.info(f"Early stop at {epoch+1}. Best AUC={self.best_score} @ {self.best_epoch+1}")
+                    logger.info(f"Early stop at {epoch+1}. Best AUC={self.best_score} @ Best Epoch {self.best_epoch+1}")

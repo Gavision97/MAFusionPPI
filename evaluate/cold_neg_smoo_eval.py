@@ -68,6 +68,50 @@ def hv_scaffold_to_get_n_epochs(neg_factor='1', smoo_factor='1', device='cuda'):
     return n_epochs, val_metrics_dict
 
 
+
+def cold_neg_smoo_eval(neg_factor='1', smoo_factor='1', n=10,
+                        folds=[1, 2, 3, 4, 5], n_epochs=None, device='cuda'):
+
+    res_dict = {f'fold{i}': [] for i in range(1, 6)}
+    val_metrics_dict = {}
+    if n_epochs is None:
+        # CV using scaffold splitter & early stopping on the validation set, 
+        # in order to get number of epochs to train the model & validation metrics
+        n_epochs, val_metrics_dict = hv_scaffold_to_get_n_epochs(neg_factor=neg_factor, smoo_factor=smoo_factor, device=device)
+    
+    logger.info(f'###### Number of epochs to train per fold after heldout validation -> {n_epochs} ######')
+    for i in folds:
+        logger.info (f"---- Start Training & Testing Fold {i} ----")
+        for exp_num in range(1, n + 1):
+            logger.info(f"experiment {exp_num} ...")
+            fold_name = f"fold{i}_{neg_factor}_{smoo_factor}"
+            fold_dir = os.path.join(DATA_PATH, f'fold{i}', str(neg_factor), str(smoo_factor))
+
+            # load train, val, & test dataset and then we drop ppi_id columns & drop duplicated rows
+            train_df = preprocess_dataset(pd.read_csv(os.path.join(fold_dir, f"train_{fold_name}.csv")))
+            test_df  = preprocess_dataset(pd.read_csv(os.path.join(fold_dir, f"test_{fold_name}.csv")))
+
+            model = MAFusionPPI(dropout=DROPOUT).to(device)
+
+            optimizer = optim.AdamW(model.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
+            criterion = nn.BCEWithLogitsLoss()
+
+            # train the model with N epochs from the heldout validation step
+            model.train_model(fold=fold_name, num_epochs=n_epochs[i-1], dataset=train_df,
+                              optimizer=optimizer, criterion=criterion, batch_size=BATCH_SIZE,
+                              device=device, num_workers=NUM_WORKERS)
+
+            # test the model on the cold test set & return metrics (auc, aupr, etc ..)
+            test_matric_dict, _ = model.test_model(test_dataset=test_df, criterion=criterion, batch_size=BATCH_SIZE,
+                                         device=device, num_workers=NUM_WORKERS)
+            curr_exp_metric_tuple = (test_matric_dict['AUC'], test_matric_dict['AUPR'], test_matric_dict['Precision'],
+                                     test_matric_dict['Sensitivity'], test_matric_dict['Specificity'])
+            res_dict[f'fold{i}'].append(curr_exp_metric_tuple)
+
+    return res_dict, val_metrics_dict
+
+
+'''
 def cold_neg_smoo_eval(neg_factor='1', smoo_factor='1', n=10, device='cuda'):
 
     res_dict = {f'fold{i}': [] for i in range(1, 6)}
@@ -105,3 +149,6 @@ def cold_neg_smoo_eval(neg_factor='1', smoo_factor='1', n=10, device='cuda'):
             res_dict[f'fold{i+1}'].append(curr_exp_metric_tuple)
 
     return res_dict, val_metrics_dict
+
+
+'''

@@ -1,5 +1,6 @@
 import os
 import logging
+import time
 logger = logging.getLogger(__name__) # get logger name
 
 import torch
@@ -27,9 +28,7 @@ def train_val_test_model(dataset, num_epochs, dropout, lr, weight_decay, criteri
     all_folds_valid_metrics = []
     all_folds_test_metrics = []
     splits = []
-    smiles_df = dataset[["smiles"]].drop_duplicates()
-    smiles_col = 'smiles'
-    
+ 
     # split dataset into 5 folds of (train, val, test) dataframes using custom butina splitter obj.
     butinaSplitter = CustomButinaSplitter()
     splits = butinaSplitter.split_dataset(dataset)

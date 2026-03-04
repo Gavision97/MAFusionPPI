@@ -27,11 +27,13 @@ PPI_DICT_PATH = 'saved_obj/ppi_dict.pkl'
 PPI_DFS_DICT_PATH = "saved_obj/enamine_ppi_dfs_dict.pkl"
 
 def cold_neg_smoo_eval_(
-    res_file_name: str = "cv_cold_neg_smoo_results",
-    neg_factor: str = "1",
-    smoo_factor: str = "1",
-    n: int = 10,
-    device: str = 'cuda'
+    res_file_name = "cv_cold_neg_smoo_results",
+    neg_factor = "1",
+    smoo_factor= "1",
+    n = 10,
+    n_epochs = [50, 50, 50, 50, 50],
+    folds = [1, 2, 3, 4, 5],
+    device = 'cuda'
 ):
     """
     Runs cv_cold_neg_smoo and appends one row to results/<res_file_name>.csv
@@ -47,18 +49,19 @@ def cold_neg_smoo_eval_(
 
     exp_name = f'dataset_neg_fct_{neg_factor}_smoo_fct_{smoo_factor}'
     logger.info(f'--- Start Cold Start Experiments for Dataset -> {exp_name} ---')
-    res_dict, val_metrics_dict = cold_neg_smoo_eval(neg_factor=neg_factor, smoo_factor=smoo_factor, n=n, device=device)
+    res_dict, val_metrics_dict = cold_neg_smoo_eval(neg_factor=neg_factor, smoo_factor=smoo_factor, n=n,
+                                                    n_epochs=n_epochs, folds=folds, device=device)
 
 
     fold_keys = [f"fold{i}" for i in range(1, 6)]    
     # we store *all* val results in one cell (as JSON)
-    row = {"exp": exp_name, "val_res": json.dumps(val_metrics_dict, default=list)}
+    row = {"exp": exp_name, "val_res": json.dumps(val_metrics_dict or {}, default=list)}
 
     # we store each fold’s list-of-tuples in its own cell (as JSON)
     for fk in fold_keys:
         # fk in val_metrics_dict is probably 'fold1'.. 'fold5'
         # fk in res_dict is also 'fold1'.. 'fold5'
-        row[fk] = json.dumps(res_dict[fk])
+        row[fk] = json.dumps(res_dict.get(fk, []))
 
     summary_df = pd.DataFrame([row], columns=["exp", "val_res"] + fold_keys)
 
@@ -110,11 +113,18 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--log_msg", type=str, default='log message', help="First message to display in the log file; for experiment description")
     parser.add_argument("--res_file_name", type=str, default='res', help="name of the result; pandas.DataFrame() object")
-    parser.add_argument("--eval_method", type=str, default='cv_neg_smoo', choices=['cv','cv_neg_smoo', 'cold', "mcd"], help="path to the smiles file")
+    parser.add_argument("--eval_method", type=str, default='cold', choices=['cv','cv_neg_smoo', 'cold', "mcd"], help="path to the smiles file")
     parser.add_argument("--cv_method", type=str, default='all', choices=['all', 'per_fam'], help="The split for 10-fold cross-validation - all data or per RNA subtype ")
-    parser.add_argument('--neg_factor', type=str, default='1', choices=['1', '2', '3', '4', '5'], help="negative sampling hyperparameter (e.g., 1, 2 ... 5)")
+    parser.add_argument('--neg_factor', type=str, default='5', choices=['1', '2', '3', '4', '5'], help="negative sampling hyperparameter (e.g., 1, 2 ... 5)")
     parser.add_argument('--smoo_factor', type=str, default='1.0', choices=['0.75', '0.8', '0.9', '0.95', '1.0'], help="")
     parser.add_argument('--n_exp', type=int, default=10, help="number of experiments for statistically significant evaluation")
+    parser.add_argument('--epo_f1', type=int, default=50, help="number of epochs to train fold 1 (cold eval)")
+    parser.add_argument('--epo_f2', type=int, default=50, help="number of epochs to train fold 2 (cold eval)")
+    parser.add_argument('--epo_f3', type=int, default=50, help="number of epochs to train fold 3 (cold eval)")
+    parser.add_argument('--epo_f4', type=int, default=50, help="number of epochs to train fold 4 (cold eval)")
+    parser.add_argument('--epo_f5', type=int, default=50, help="number of epochs to train fold 5 (cold eval)")
+    parser.add_argument('--n_epochs', type=int, nargs=5, default=[50, 50, 50, 50, 50], help="List of 5 epoch values for cold eval")
+    parser.add_argument('--folds', type=int, nargs='+', default=[1, 2, 3, 4, 5], help="List of folds for cold eval (1-5)")
     parser.add_argument("--log_file_name", type=str, default="res", help="name of the logger file (e.g., result.log)")
     parser.add_argument("--device", type=str, default='cuda', choices=['cuda', 'cpu'], help="device to use - cuda/cpu")
     args = parser.parse_args()
@@ -127,6 +137,13 @@ def main():
     neg_factor = args.neg_factor
     smoo_factor = args.smoo_factor
     n_exp = args.n_exp
+    epo_f1 = args.epo_f1
+    epo_f2 = args.epo_f2
+    epo_f3 = args.epo_f3
+    epo_f4 = args.epo_f4
+    epo_f5 = args.epo_f5
+    n_epochs = args.n_epochs
+    folds = args.folds
     device = args.device
 
 
@@ -140,9 +157,11 @@ def main():
     
     logger.info(log_msg)
     if eval_method == 'cold':
-        pass # # TODO: finish building cold eval pipeline & test it
+        nel = [epo_f1, epo_f2, epo_f3, epo_f4, epo_f5]
+        train_test_cold_start_ppi(nel=nel, n=n_exp)
     elif eval_method =='cv_neg_smoo':
-        cold_neg_smoo_eval_(neg_factor=neg_factor, smoo_factor=smoo_factor, res_file_name=res_file_name, n=n_exp, device=device)
+        cold_neg_smoo_eval_(neg_factor=neg_factor, smoo_factor=smoo_factor, res_file_name=res_file_name, n=n_exp,
+                            n_epochs=n_epochs, folds=folds, device=device)
     elif eval_method == 'mcd':
         pass # TODO: finish building mcd pipeline & test it
 

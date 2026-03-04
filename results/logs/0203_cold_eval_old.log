@@ -1,0 +1,257 @@
+2026-03-02 11:25:23,341 - 02/03 - cold start experiment @ old hypeparameters - senaty check
+2026-03-02 11:25:23,916 - --- Start training! ---
+2026-03-02 11:25:23,916 - Starting Experiment 1
+2026-03-02 11:25:23,916 - MultiPPIMI model with self, with mlps after flatten
+2026-03-02 11:25:25,481 - Initializing MoleculeDataset !
+2026-03-02 11:25:41,546 - Start training fold1 for 31 epochs !
+2026-03-02 11:26:32,268 - Epoch 1 Time: 0.85 min, Train Loss: 0.68885, Train AUC: 0.69490, Train AUPR: 0.39518, Precision: 0.32715, Sensitivity: 0.47681, Specificity: 0.79827
+2026-03-02 11:27:23,269 - Epoch 2 Time: 0.85 min, Train Loss: 0.56221, Train AUC: 0.85252, Train AUPR: 0.68608, Precision: 0.53291, Sensitivity: 0.64761, Specificity: 0.88322
+2026-03-02 11:28:15,312 - Epoch 3 Time: 0.87 min, Train Loss: 0.47393, Train AUC: 0.90106, Train AUPR: 0.77527, Precision: 0.64760, Sensitivity: 0.68676, Specificity: 0.92314
+2026-03-02 11:29:06,834 - Epoch 4 Time: 0.86 min, Train Loss: 0.39964, Train AUC: 0.92764, Train AUPR: 0.82465, Precision: 0.72971, Sensitivity: 0.71110, Specificity: 0.94581
+2026-03-02 11:29:58,758 - Epoch 5 Time: 0.87 min, Train Loss: 0.33140, Train AUC: 0.94674, Train AUPR: 0.86163, Precision: 0.80258, Sensitivity: 0.72628, Specificity: 0.96326
+2026-03-02 11:30:51,779 - Epoch 6 Time: 0.88 min, Train Loss: 0.27959, Train AUC: 0.95656, Train AUPR: 0.88251, Precision: 0.83792, Sensitivity: 0.73803, Specificity: 0.97063
+2026-03-02 11:31:43,609 - Epoch 7 Time: 0.86 min, Train Loss: 0.23827, Train AUC: 0.96362, Train AUPR: 0.89914, Precision: 0.87082, Sensitivity: 0.74768, Specificity: 0.97718
+2026-03-02 11:32:35,328 - Epoch 8 Time: 0.86 min, Train Loss: 0.20361, Train AUC: 0.97136, Train AUPR: 0.91631, Precision: 0.89021, Sensitivity: 0.76503, Specificity: 0.98059
+2026-03-02 11:33:26,851 - Epoch 9 Time: 0.86 min, Train Loss: 0.17730, Train AUC: 0.97649, Train AUPR: 0.92829, Precision: 0.90019, Sensitivity: 0.77682, Specificity: 0.98228
+2026-03-02 11:34:18,782 - Epoch 10 Time: 0.87 min, Train Loss: 0.15797, Train AUC: 0.97946, Train AUPR: 0.93647, Precision: 0.91219, Sensitivity: 0.79212, Specificity: 0.98432
+2026-03-02 11:35:09,828 - Epoch 11 Time: 0.85 min, Train Loss: 0.14034, Train AUC: 0.98301, Train AUPR: 0.94534, Precision: 0.91696, Sensitivity: 0.80845, Specificity: 0.98494
+2026-03-02 11:36:00,560 - Epoch 12 Time: 0.85 min, Train Loss: 0.12974, Train AUC: 0.98504, Train AUPR: 0.94990, Precision: 0.92131, Sensitivity: 0.81343, Specificity: 0.98571
+2026-03-02 11:36:51,671 - Epoch 13 Time: 0.85 min, Train Loss: 0.11423, Train AUC: 0.98748, Train AUPR: 0.95888, Precision: 0.93304, Sensitivity: 0.82667, Specificity: 0.98780
+2026-03-02 11:37:44,092 - Epoch 14 Time: 0.87 min, Train Loss: 0.10701, Train AUC: 0.98917, Train AUPR: 0.96248, Precision: 0.93330, Sensitivity: 0.83858, Specificity: 0.98767
+2026-03-02 11:38:35,846 - Epoch 15 Time: 0.86 min, Train Loss: 0.09830, Train AUC: 0.99056, Train AUPR: 0.96698, Precision: 0.94106, Sensitivity: 0.84708, Specificity: 0.98909
+2026-03-02 11:39:27,021 - Epoch 16 Time: 0.85 min, Train Loss: 0.09469, Train AUC: 0.99107, Train AUPR: 0.96837, Precision: 0.93698, Sensitivity: 0.85541, Specificity: 0.98817
+2026-03-02 11:39:53,334 - 02/03 - cold start experiment @ old hypeparameters - senaty check
+2026-03-02 11:39:53,660 - --- Start training! ---
+2026-03-02 11:39:53,660 - Starting Experiment 1
+2026-03-02 11:39:53,660 - MultiPPIMI model with self, with mlps after flatten
+2026-03-02 11:39:54,685 - Initializing MoleculeDataset !
+2026-03-02 11:40:06,464 - Start training fold1 for 31 epochs !
+2026-03-02 11:40:57,799 - Epoch 1 Time: 0.86 min, Train Loss: 0.69565, Train AUC: 0.68257, Train AUPR: 0.38535, Precision: 0.32140, Sensitivity: 0.46264, Specificity: 0.79906
+2026-03-02 11:41:49,217 - Epoch 2 Time: 0.86 min, Train Loss: 0.57442, Train AUC: 0.83745, Train AUPR: 0.65809, Precision: 0.51268, Sensitivity: 0.62394, Specificity: 0.87804
+2026-03-02 11:42:39,895 - Epoch 3 Time: 0.84 min, Train Loss: 0.48096, Train AUC: 0.89026, Train AUPR: 0.75717, Precision: 0.64510, Sensitivity: 0.66592, Specificity: 0.92464
+2026-03-02 11:43:30,732 - Epoch 4 Time: 0.85 min, Train Loss: 0.40102, Train AUC: 0.92377, Train AUPR: 0.81728, Precision: 0.74307, Sensitivity: 0.69755, Specificity: 0.95038
+2026-03-02 11:44:21,825 - Epoch 5 Time: 0.85 min, Train Loss: 0.33863, Train AUC: 0.94094, Train AUPR: 0.85103, Precision: 0.79469, Sensitivity: 0.71254, Specificity: 0.96214
+2026-03-02 11:45:13,475 - Epoch 6 Time: 0.86 min, Train Loss: 0.28659, Train AUC: 0.95329, Train AUPR: 0.87613, Precision: 0.83638, Sensitivity: 0.73069, Specificity: 0.97059
+2026-03-02 11:46:04,409 - Epoch 7 Time: 0.85 min, Train Loss: 0.24482, Train AUC: 0.96108, Train AUPR: 0.89414, Precision: 0.86616, Sensitivity: 0.74694, Specificity: 0.97626
+2026-03-02 11:46:55,013 - Epoch 8 Time: 0.84 min, Train Loss: 0.20805, Train AUC: 0.96968, Train AUPR: 0.91234, Precision: 0.88916, Sensitivity: 0.75682, Specificity: 0.98059
+2026-03-02 11:47:47,207 - Epoch 9 Time: 0.87 min, Train Loss: 0.18478, Train AUC: 0.97373, Train AUPR: 0.92206, Precision: 0.89317, Sensitivity: 0.77112, Specificity: 0.98103
+2026-03-02 11:48:38,399 - Epoch 10 Time: 0.85 min, Train Loss: 0.16127, Train AUC: 0.97874, Train AUPR: 0.93430, Precision: 0.91574, Sensitivity: 0.78222, Specificity: 0.98520
+2026-03-02 11:49:30,596 - Epoch 11 Time: 0.87 min, Train Loss: 0.14671, Train AUC: 0.98151, Train AUPR: 0.94092, Precision: 0.91734, Sensitivity: 0.79127, Specificity: 0.98535
+2026-03-02 11:50:21,108 - Epoch 12 Time: 0.84 min, Train Loss: 0.13268, Train AUC: 0.98367, Train AUPR: 0.94811, Precision: 0.92854, Sensitivity: 0.80526, Specificity: 0.98725
+2026-03-02 11:51:12,242 - Epoch 13 Time: 0.85 min, Train Loss: 0.12195, Train AUC: 0.98577, Train AUPR: 0.95361, Precision: 0.93067, Sensitivity: 0.82032, Specificity: 0.98744
+2026-03-02 11:52:03,803 - Epoch 14 Time: 0.86 min, Train Loss: 0.10911, Train AUC: 0.98838, Train AUPR: 0.96127, Precision: 0.94002, Sensitivity: 0.83327, Specificity: 0.98907
+2026-03-02 11:52:54,613 - Epoch 15 Time: 0.85 min, Train Loss: 0.10263, Train AUC: 0.98955, Train AUPR: 0.96424, Precision: 0.93625, Sensitivity: 0.84239, Specificity: 0.98821
+2026-03-02 11:53:46,187 - Epoch 16 Time: 0.86 min, Train Loss: 0.09664, Train AUC: 0.99062, Train AUPR: 0.96763, Precision: 0.93879, Sensitivity: 0.85087, Specificity: 0.98859
+2026-03-02 11:54:38,009 - Epoch 17 Time: 0.86 min, Train Loss: 0.08772, Train AUC: 0.99196, Train AUPR: 0.97243, Precision: 0.94526, Sensitivity: 0.86248, Specificity: 0.98973
+2026-03-02 11:55:28,981 - Epoch 18 Time: 0.85 min, Train Loss: 0.07992, Train AUC: 0.99356, Train AUPR: 0.97655, Precision: 0.95252, Sensitivity: 0.87324, Specificity: 0.99105
+2026-03-02 11:56:20,036 - Epoch 19 Time: 0.85 min, Train Loss: 0.07761, Train AUC: 0.99397, Train AUPR: 0.97794, Precision: 0.94979, Sensitivity: 0.88259, Specificity: 0.99041
+2026-03-02 11:57:10,203 - Epoch 20 Time: 0.84 min, Train Loss: 0.07325, Train AUC: 0.99426, Train AUPR: 0.97932, Precision: 0.95056, Sensitivity: 0.88308, Specificity: 0.99055
+2026-03-02 11:58:01,494 - Epoch 21 Time: 0.85 min, Train Loss: 0.06871, Train AUC: 0.99496, Train AUPR: 0.98160, Precision: 0.95415, Sensitivity: 0.89295, Specificity: 0.99118
+2026-03-02 11:58:52,127 - Epoch 22 Time: 0.84 min, Train Loss: 0.06736, Train AUC: 0.99498, Train AUPR: 0.98178, Precision: 0.95340, Sensitivity: 0.89763, Specificity: 0.99097
+2026-03-02 11:59:43,301 - Epoch 23 Time: 0.85 min, Train Loss: 0.05991, Train AUC: 0.99621, Train AUPR: 0.98577, Precision: 0.95913, Sensitivity: 0.90406, Specificity: 0.99208
+2026-03-02 12:00:35,104 - Epoch 24 Time: 0.86 min, Train Loss: 0.05770, Train AUC: 0.99651, Train AUPR: 0.98669, Precision: 0.95998, Sensitivity: 0.91366, Specificity: 0.99217
+2026-03-02 12:01:26,409 - Epoch 25 Time: 0.86 min, Train Loss: 0.05615, Train AUC: 0.99661, Train AUPR: 0.98723, Precision: 0.96186, Sensitivity: 0.91546, Specificity: 0.99253
+2026-03-02 12:02:17,098 - Epoch 26 Time: 0.84 min, Train Loss: 0.05266, Train AUC: 0.99702, Train AUPR: 0.98862, Precision: 0.96323, Sensitivity: 0.91789, Specificity: 0.99279
+2026-03-02 12:03:08,452 - Epoch 27 Time: 0.86 min, Train Loss: 0.05180, Train AUC: 0.99716, Train AUPR: 0.98890, Precision: 0.96286, Sensitivity: 0.92482, Specificity: 0.99266
+2026-03-02 12:03:59,592 - Epoch 28 Time: 0.85 min, Train Loss: 0.04926, Train AUC: 0.99734, Train AUPR: 0.98988, Precision: 0.96440, Sensitivity: 0.92502, Specificity: 0.99297
+2026-03-02 12:04:51,566 - Epoch 29 Time: 0.87 min, Train Loss: 0.04482, Train AUC: 0.99772, Train AUPR: 0.99138, Precision: 0.96934, Sensitivity: 0.93590, Specificity: 0.99391
+2026-03-02 12:05:42,207 - Epoch 30 Time: 0.84 min, Train Loss: 0.04539, Train AUC: 0.99774, Train AUPR: 0.99109, Precision: 0.96698, Sensitivity: 0.93291, Specificity: 0.99345
+2026-03-02 12:06:33,716 - Epoch 31 Time: 0.86 min, Train Loss: 0.04280, Train AUC: 0.99801, Train AUPR: 0.99217, Precision: 0.96675, Sensitivity: 0.93597, Specificity: 0.99338
+2026-03-02 12:06:33,732 - Initializing MoleculeDataset !
+2026-03-02 12:06:42,797 - Test Loss: 2.0986
+2026-03-02 12:06:42,797 - Test AUC: 0.7135
+2026-03-02 12:06:42,797 - Test AUPR: 0.6409
+2026-03-02 12:06:42,797 - Test Precision: 0.7147
+2026-03-02 12:06:42,797 - Test Sensitivity (Recall): 0.1255
+2026-03-02 12:06:42,797 - Test Specificity: 0.9499
+2026-03-02 12:06:42,811 - MultiPPIMI model with self, with mlps after flatten
+2026-03-02 12:06:42,863 - Initializing MoleculeDataset !
+2026-03-02 12:06:54,799 - Start training fold2 for 28 epochs !
+2026-03-02 12:07:51,046 - Epoch 1 Time: 0.94 min, Train Loss: 0.64046, Train AUC: 0.67970, Train AUPR: 0.39020, Precision: 0.36786, Sensitivity: 0.37870, Specificity: 0.86230
+2026-03-02 12:08:46,524 - Epoch 2 Time: 0.92 min, Train Loss: 0.52292, Train AUC: 0.84043, Train AUPR: 0.66814, Precision: 0.60107, Sensitivity: 0.58810, Specificity: 0.91742
+2026-03-02 12:09:42,490 - Epoch 3 Time: 0.93 min, Train Loss: 0.43229, Train AUC: 0.90369, Train AUPR: 0.78344, Precision: 0.72655, Sensitivity: 0.66716, Specificity: 0.94688
+2026-03-02 12:10:38,253 - Epoch 4 Time: 0.93 min, Train Loss: 0.35343, Train AUC: 0.93545, Train AUPR: 0.84560, Precision: 0.80876, Sensitivity: 0.71275, Specificity: 0.96434
+2026-03-02 12:11:34,395 - Epoch 5 Time: 0.94 min, Train Loss: 0.29051, Train AUC: 0.95334, Train AUPR: 0.87998, Precision: 0.85445, Sensitivity: 0.73695, Specificity: 0.97344
+2026-03-02 12:12:30,489 - Epoch 6 Time: 0.93 min, Train Loss: 0.24190, Train AUC: 0.96458, Train AUPR: 0.90343, Precision: 0.88332, Sensitivity: 0.75018, Specificity: 0.97904
+2026-03-02 12:13:27,872 - Epoch 7 Time: 0.96 min, Train Loss: 0.20574, Train AUC: 0.97153, Train AUPR: 0.91856, Precision: 0.89607, Sensitivity: 0.76827, Specificity: 0.98116
+2026-03-02 12:14:24,616 - Epoch 8 Time: 0.95 min, Train Loss: 0.17726, Train AUC: 0.97647, Train AUPR: 0.93087, Precision: 0.91530, Sensitivity: 0.77966, Specificity: 0.98474
+2026-03-02 12:15:20,651 - Epoch 9 Time: 0.93 min, Train Loss: 0.15530, Train AUC: 0.98054, Train AUPR: 0.94083, Precision: 0.92403, Sensitivity: 0.79306, Specificity: 0.98620
+2026-03-02 12:16:15,678 - Epoch 10 Time: 0.92 min, Train Loss: 0.13618, Train AUC: 0.98486, Train AUPR: 0.95095, Precision: 0.92866, Sensitivity: 0.80868, Specificity: 0.98686
+2026-03-02 12:17:10,543 - Epoch 11 Time: 0.91 min, Train Loss: 0.12299, Train AUC: 0.98640, Train AUPR: 0.95665, Precision: 0.93460, Sensitivity: 0.82709, Specificity: 0.98775
+2026-03-02 12:18:08,152 - Epoch 12 Time: 0.96 min, Train Loss: 0.11191, Train AUC: 0.98876, Train AUPR: 0.96232, Precision: 0.93441, Sensitivity: 0.83512, Specificity: 0.98760
+2026-03-02 12:19:04,731 - Epoch 13 Time: 0.94 min, Train Loss: 0.09977, Train AUC: 0.99080, Train AUPR: 0.96857, Precision: 0.94379, Sensitivity: 0.84861, Specificity: 0.98930
+2026-03-02 12:20:00,617 - Epoch 14 Time: 0.93 min, Train Loss: 0.09028, Train AUC: 0.99197, Train AUPR: 0.97325, Precision: 0.94762, Sensitivity: 0.86474, Specificity: 0.98989
+2026-03-02 12:20:56,724 - Epoch 15 Time: 0.94 min, Train Loss: 0.08450, Train AUC: 0.99309, Train AUPR: 0.97587, Precision: 0.94575, Sensitivity: 0.87196, Specificity: 0.98942
+2026-03-02 12:21:52,733 - Epoch 16 Time: 0.93 min, Train Loss: 0.07641, Train AUC: 0.99418, Train AUPR: 0.97989, Precision: 0.95266, Sensitivity: 0.88493, Specificity: 0.99070
+2026-03-02 12:22:49,586 - Epoch 17 Time: 0.95 min, Train Loss: 0.07123, Train AUC: 0.99480, Train AUPR: 0.98203, Precision: 0.95462, Sensitivity: 0.89599, Specificity: 0.99099
+2026-03-02 12:23:46,798 - Epoch 18 Time: 0.95 min, Train Loss: 0.06731, Train AUC: 0.99517, Train AUPR: 0.98338, Precision: 0.95825, Sensitivity: 0.90090, Specificity: 0.99170
+2026-03-02 12:24:42,769 - Epoch 19 Time: 0.93 min, Train Loss: 0.06398, Train AUC: 0.99572, Train AUPR: 0.98484, Precision: 0.95681, Sensitivity: 0.90883, Specificity: 0.99132
+2026-03-02 12:25:39,255 - Epoch 20 Time: 0.94 min, Train Loss: 0.05860, Train AUC: 0.99631, Train AUPR: 0.98716, Precision: 0.96264, Sensitivity: 0.91672, Specificity: 0.99247
+2026-03-02 12:26:35,739 - Epoch 21 Time: 0.94 min, Train Loss: 0.05663, Train AUC: 0.99647, Train AUPR: 0.98765, Precision: 0.96139, Sensitivity: 0.92241, Specificity: 0.99216
+2026-03-02 12:27:31,497 - Epoch 22 Time: 0.93 min, Train Loss: 0.05299, Train AUC: 0.99691, Train AUPR: 0.98899, Precision: 0.96520, Sensitivity: 0.92576, Specificity: 0.99294
+2026-03-02 12:28:27,268 - Epoch 23 Time: 0.93 min, Train Loss: 0.04902, Train AUC: 0.99721, Train AUPR: 0.99039, Precision: 0.96891, Sensitivity: 0.93151, Specificity: 0.99368
+2026-03-02 12:29:23,598 - Epoch 24 Time: 0.94 min, Train Loss: 0.04606, Train AUC: 0.99747, Train AUPR: 0.99133, Precision: 0.97200, Sensitivity: 0.93598, Specificity: 0.99430
+2026-03-02 12:30:19,808 - Epoch 25 Time: 0.94 min, Train Loss: 0.04443, Train AUC: 0.99789, Train AUPR: 0.99208, Precision: 0.97079, Sensitivity: 0.93956, Specificity: 0.99402
+2026-03-02 12:31:16,140 - Epoch 26 Time: 0.94 min, Train Loss: 0.04176, Train AUC: 0.99807, Train AUPR: 0.99279, Precision: 0.97149, Sensitivity: 0.94341, Specificity: 0.99414
+2026-03-02 12:32:11,690 - Epoch 27 Time: 0.93 min, Train Loss: 0.03932, Train AUC: 0.99823, Train AUPR: 0.99353, Precision: 0.97605, Sensitivity: 0.94569, Specificity: 0.99509
+2026-03-02 12:33:08,092 - Epoch 28 Time: 0.94 min, Train Loss: 0.03937, Train AUC: 0.99826, Train AUPR: 0.99343, Precision: 0.97301, Sensitivity: 0.94790, Specificity: 0.99444
+2026-03-02 12:33:08,109 - Initializing MoleculeDataset !
+2026-03-02 12:33:15,774 - Test Loss: 1.9206
+2026-03-02 12:33:15,774 - Test AUC: 0.8088
+2026-03-02 12:33:15,774 - Test AUPR: 0.7597
+2026-03-02 12:33:15,774 - Test Precision: 0.8744
+2026-03-02 12:33:15,774 - Test Sensitivity (Recall): 0.1617
+2026-03-02 12:33:15,774 - Test Specificity: 0.9759
+2026-03-02 12:33:15,790 - MultiPPIMI model with self, with mlps after flatten
+2026-03-02 12:33:15,843 - Initializing MoleculeDataset !
+2026-03-02 12:33:28,169 - Start training fold3 for 34 epochs !
+2026-03-02 12:34:23,282 - Epoch 1 Time: 0.92 min, Train Loss: 0.66350, Train AUC: 0.67875, Train AUPR: 0.38321, Precision: 0.35455, Sensitivity: 0.38789, Specificity: 0.85325
+2026-03-02 12:35:17,978 - Epoch 2 Time: 0.91 min, Train Loss: 0.55567, Train AUC: 0.83054, Train AUPR: 0.64678, Precision: 0.56438, Sensitivity: 0.56448, Specificity: 0.90948
+2026-03-02 12:36:12,872 - Epoch 3 Time: 0.91 min, Train Loss: 0.47047, Train AUC: 0.89007, Train AUPR: 0.74918, Precision: 0.68399, Sensitivity: 0.63621, Specificity: 0.93889
+2026-03-02 12:37:07,248 - Epoch 4 Time: 0.91 min, Train Loss: 0.39285, Train AUC: 0.92867, Train AUPR: 0.82033, Precision: 0.76743, Sensitivity: 0.69074, Specificity: 0.95648
+2026-03-02 12:38:03,769 - Epoch 5 Time: 0.94 min, Train Loss: 0.32594, Train AUC: 0.94630, Train AUPR: 0.86106, Precision: 0.82149, Sensitivity: 0.72074, Specificity: 0.96745
+2026-03-02 12:38:58,073 - Epoch 6 Time: 0.91 min, Train Loss: 0.27226, Train AUC: 0.95969, Train AUPR: 0.88738, Precision: 0.85050, Sensitivity: 0.73632, Specificity: 0.97310
+2026-03-02 12:39:53,852 - Epoch 7 Time: 0.93 min, Train Loss: 0.23174, Train AUC: 0.96672, Train AUPR: 0.90392, Precision: 0.87626, Sensitivity: 0.74920, Specificity: 0.97801
+2026-03-02 12:40:49,752 - Epoch 8 Time: 0.93 min, Train Loss: 0.19633, Train AUC: 0.97324, Train AUPR: 0.91959, Precision: 0.89496, Sensitivity: 0.75951, Specificity: 0.98148
+2026-03-02 12:41:44,541 - Epoch 9 Time: 0.91 min, Train Loss: 0.17159, Train AUC: 0.97830, Train AUPR: 0.93177, Precision: 0.90567, Sensitivity: 0.78090, Specificity: 0.98310
+2026-03-02 12:42:39,507 - Epoch 10 Time: 0.92 min, Train Loss: 0.15087, Train AUC: 0.98127, Train AUPR: 0.94099, Precision: 0.91682, Sensitivity: 0.79172, Specificity: 0.98507
+2026-03-02 12:43:36,000 - Epoch 11 Time: 0.94 min, Train Loss: 0.13383, Train AUC: 0.98497, Train AUPR: 0.95014, Precision: 0.92207, Sensitivity: 0.81084, Specificity: 0.98576
+2026-03-02 12:44:30,926 - Epoch 12 Time: 0.92 min, Train Loss: 0.12057, Train AUC: 0.98738, Train AUPR: 0.95707, Precision: 0.93031, Sensitivity: 0.82667, Specificity: 0.98713
+2026-03-02 12:45:25,982 - Epoch 13 Time: 0.92 min, Train Loss: 0.10916, Train AUC: 0.98942, Train AUPR: 0.96288, Precision: 0.92946, Sensitivity: 0.83953, Specificity: 0.98676
+2026-03-02 12:46:20,263 - Epoch 14 Time: 0.90 min, Train Loss: 0.09853, Train AUC: 0.99079, Train AUPR: 0.96807, Precision: 0.94081, Sensitivity: 0.85505, Specificity: 0.98882
+2026-03-02 12:47:14,811 - Epoch 15 Time: 0.91 min, Train Loss: 0.09228, Train AUC: 0.99176, Train AUPR: 0.97116, Precision: 0.94216, Sensitivity: 0.86651, Specificity: 0.98894
+2026-03-02 12:48:10,093 - Epoch 16 Time: 0.92 min, Train Loss: 0.08468, Train AUC: 0.99278, Train AUPR: 0.97457, Precision: 0.94683, Sensitivity: 0.87619, Specificity: 0.98977
+2026-03-02 12:49:04,467 - Epoch 17 Time: 0.91 min, Train Loss: 0.07979, Train AUC: 0.99357, Train AUPR: 0.97704, Precision: 0.94355, Sensitivity: 0.88761, Specificity: 0.98896
+2026-03-02 12:50:01,140 - Epoch 18 Time: 0.94 min, Train Loss: 0.07535, Train AUC: 0.99440, Train AUPR: 0.97935, Precision: 0.94650, Sensitivity: 0.89151, Specificity: 0.98952
+2026-03-02 12:50:57,179 - Epoch 19 Time: 0.93 min, Train Loss: 0.07224, Train AUC: 0.99469, Train AUPR: 0.98069, Precision: 0.94597, Sensitivity: 0.90272, Specificity: 0.98928
+2026-03-02 12:51:51,870 - Epoch 20 Time: 0.91 min, Train Loss: 0.06526, Train AUC: 0.99566, Train AUPR: 0.98384, Precision: 0.95392, Sensitivity: 0.90633, Specificity: 0.99090
+2026-03-02 12:52:47,623 - Epoch 21 Time: 0.93 min, Train Loss: 0.06163, Train AUC: 0.99616, Train AUPR: 0.98537, Precision: 0.95421, Sensitivity: 0.90918, Specificity: 0.99093
+2026-03-02 12:53:42,336 - Epoch 22 Time: 0.91 min, Train Loss: 0.05973, Train AUC: 0.99615, Train AUPR: 0.98606, Precision: 0.95542, Sensitivity: 0.92022, Specificity: 0.99107
+2026-03-02 12:54:38,144 - Epoch 23 Time: 0.93 min, Train Loss: 0.05468, Train AUC: 0.99679, Train AUPR: 0.98811, Precision: 0.96153, Sensitivity: 0.92521, Specificity: 0.99231
+2026-03-02 12:55:33,143 - Epoch 24 Time: 0.92 min, Train Loss: 0.05139, Train AUC: 0.99733, Train AUPR: 0.98948, Precision: 0.96334, Sensitivity: 0.92817, Specificity: 0.99266
+2026-03-02 12:56:28,353 - Epoch 25 Time: 0.92 min, Train Loss: 0.04883, Train AUC: 0.99753, Train AUPR: 0.99037, Precision: 0.96295, Sensitivity: 0.93351, Specificity: 0.99254
+2026-03-02 12:57:23,969 - Epoch 26 Time: 0.93 min, Train Loss: 0.04688, Train AUC: 0.99761, Train AUPR: 0.99096, Precision: 0.96599, Sensitivity: 0.93351, Specificity: 0.99317
+2026-03-02 12:58:19,255 - Epoch 27 Time: 0.92 min, Train Loss: 0.04561, Train AUC: 0.99768, Train AUPR: 0.99129, Precision: 0.96850, Sensitivity: 0.93750, Specificity: 0.99366
+2026-03-02 12:59:15,512 - Epoch 28 Time: 0.94 min, Train Loss: 0.04400, Train AUC: 0.99781, Train AUPR: 0.99183, Precision: 0.96697, Sensitivity: 0.94240, Specificity: 0.99331
+2026-03-02 13:00:11,480 - Epoch 29 Time: 0.93 min, Train Loss: 0.04079, Train AUC: 0.99808, Train AUPR: 0.99273, Precision: 0.97211, Sensitivity: 0.94470, Specificity: 0.99437
+2026-03-02 13:01:06,380 - Epoch 30 Time: 0.91 min, Train Loss: 0.03830, Train AUC: 0.99832, Train AUPR: 0.99357, Precision: 0.97136, Sensitivity: 0.94832, Specificity: 0.99419
+2026-03-02 13:01:59,859 - Epoch 31 Time: 0.89 min, Train Loss: 0.03758, Train AUC: 0.99840, Train AUPR: 0.99380, Precision: 0.97202, Sensitivity: 0.95037, Specificity: 0.99431
+2026-03-02 13:02:54,475 - Epoch 32 Time: 0.91 min, Train Loss: 0.03557, Train AUC: 0.99862, Train AUPR: 0.99448, Precision: 0.97288, Sensitivity: 0.95097, Specificity: 0.99449
+2026-03-02 13:03:49,577 - Epoch 33 Time: 0.92 min, Train Loss: 0.03510, Train AUC: 0.99868, Train AUPR: 0.99458, Precision: 0.97261, Sensitivity: 0.95333, Specificity: 0.99442
+2026-03-02 13:04:44,005 - Epoch 34 Time: 0.91 min, Train Loss: 0.03209, Train AUC: 0.99874, Train AUPR: 0.99529, Precision: 0.97700, Sensitivity: 0.95697, Specificity: 0.99532
+2026-03-02 13:04:44,023 - Initializing MoleculeDataset !
+2026-03-02 13:04:51,827 - Test Loss: 1.4711
+2026-03-02 13:04:51,827 - Test AUC: 0.9103
+2026-03-02 13:04:51,827 - Test AUPR: 0.8969
+2026-03-02 13:04:51,827 - Test Precision: 0.9565
+2026-03-02 13:04:51,827 - Test Sensitivity (Recall): 0.3322
+2026-03-02 13:04:51,827 - Test Specificity: 0.9847
+2026-03-02 13:04:51,843 - MultiPPIMI model with self, with mlps after flatten
+2026-03-02 13:04:51,895 - Initializing MoleculeDataset !
+2026-03-02 13:05:02,726 - Start training fold4 for 33 epochs !
+2026-03-02 13:05:49,682 - Epoch 1 Time: 0.78 min, Train Loss: 0.68430, Train AUC: 0.63126, Train AUPR: 0.23839, Precision: 0.24255, Sensitivity: 0.33223, Specificity: 0.82385
+2026-03-02 13:06:37,553 - Epoch 2 Time: 0.80 min, Train Loss: 0.61331, Train AUC: 0.77530, Train AUPR: 0.45818, Precision: 0.39369, Sensitivity: 0.49804, Specificity: 0.86985
+2026-03-02 13:07:24,485 - Epoch 3 Time: 0.78 min, Train Loss: 0.55882, Train AUC: 0.84639, Train AUPR: 0.60287, Precision: 0.47992, Sensitivity: 0.59886, Specificity: 0.88988
+2026-03-02 13:08:10,604 - Epoch 4 Time: 0.77 min, Train Loss: 0.51156, Train AUC: 0.88019, Train AUPR: 0.67751, Precision: 0.53958, Sensitivity: 0.64071, Specificity: 0.90718
+2026-03-02 13:08:57,384 - Epoch 5 Time: 0.78 min, Train Loss: 0.46698, Train AUC: 0.90197, Train AUPR: 0.72580, Precision: 0.59538, Sensitivity: 0.66639, Specificity: 0.92310
+2026-03-02 13:09:44,159 - Epoch 6 Time: 0.78 min, Train Loss: 0.42326, Train AUC: 0.91775, Train AUPR: 0.76133, Precision: 0.64303, Sensitivity: 0.68151, Specificity: 0.93578
+2026-03-02 13:10:32,230 - Epoch 7 Time: 0.80 min, Train Loss: 0.38198, Train AUC: 0.93149, Train AUPR: 0.79285, Precision: 0.68897, Sensitivity: 0.69314, Specificity: 0.94688
+2026-03-02 13:11:19,212 - Epoch 8 Time: 0.78 min, Train Loss: 0.34542, Train AUC: 0.93943, Train AUPR: 0.81121, Precision: 0.71864, Sensitivity: 0.69100, Specificity: 0.95407
+2026-03-02 13:12:05,848 - Epoch 9 Time: 0.78 min, Train Loss: 0.30817, Train AUC: 0.94854, Train AUPR: 0.83484, Precision: 0.76728, Sensitivity: 0.70497, Specificity: 0.96371
+2026-03-02 13:12:52,674 - Epoch 10 Time: 0.78 min, Train Loss: 0.27776, Train AUC: 0.95414, Train AUPR: 0.84906, Precision: 0.79303, Sensitivity: 0.70749, Specificity: 0.96864
+2026-03-02 13:13:39,260 - Epoch 11 Time: 0.78 min, Train Loss: 0.24792, Train AUC: 0.96199, Train AUPR: 0.86809, Precision: 0.81987, Sensitivity: 0.71879, Specificity: 0.97318
+2026-03-02 13:14:26,306 - Epoch 12 Time: 0.78 min, Train Loss: 0.22280, Train AUC: 0.96536, Train AUPR: 0.88120, Precision: 0.83659, Sensitivity: 0.73273, Specificity: 0.97570
+2026-03-02 13:15:14,041 - Epoch 13 Time: 0.80 min, Train Loss: 0.20004, Train AUC: 0.97031, Train AUPR: 0.89544, Precision: 0.85736, Sensitivity: 0.74570, Specificity: 0.97894
+2026-03-02 13:16:01,031 - Epoch 14 Time: 0.78 min, Train Loss: 0.18289, Train AUC: 0.97392, Train AUPR: 0.90484, Precision: 0.86208, Sensitivity: 0.75534, Specificity: 0.97949
+2026-03-02 13:16:48,106 - Epoch 15 Time: 0.78 min, Train Loss: 0.16599, Train AUC: 0.97675, Train AUPR: 0.91496, Precision: 0.87727, Sensitivity: 0.77432, Specificity: 0.98160
+2026-03-02 13:17:34,545 - Epoch 16 Time: 0.77 min, Train Loss: 0.15047, Train AUC: 0.98041, Train AUPR: 0.92556, Precision: 0.89167, Sensitivity: 0.78599, Specificity: 0.98380
+2026-03-02 13:18:20,376 - Epoch 17 Time: 0.76 min, Train Loss: 0.13727, Train AUC: 0.98285, Train AUPR: 0.93493, Precision: 0.90128, Sensitivity: 0.79537, Specificity: 0.98521
+2026-03-02 13:19:07,473 - Epoch 18 Time: 0.78 min, Train Loss: 0.12540, Train AUC: 0.98519, Train AUPR: 0.94136, Precision: 0.90804, Sensitivity: 0.80796, Specificity: 0.98612
+2026-03-02 13:19:54,967 - Epoch 19 Time: 0.79 min, Train Loss: 0.11875, Train AUC: 0.98643, Train AUPR: 0.94560, Precision: 0.90933, Sensitivity: 0.81800, Specificity: 0.98616
+2026-03-02 13:20:42,645 - Epoch 20 Time: 0.79 min, Train Loss: 0.10846, Train AUC: 0.98815, Train AUPR: 0.95270, Precision: 0.91674, Sensitivity: 0.83141, Specificity: 0.98718
+2026-03-02 13:21:30,491 - Epoch 21 Time: 0.80 min, Train Loss: 0.10136, Train AUC: 0.98979, Train AUPR: 0.95734, Precision: 0.92357, Sensitivity: 0.84647, Specificity: 0.98811
+2026-03-02 13:22:19,041 - Epoch 22 Time: 0.81 min, Train Loss: 0.09660, Train AUC: 0.99043, Train AUPR: 0.95944, Precision: 0.92490, Sensitivity: 0.84057, Specificity: 0.98841
+2026-03-02 13:23:06,625 - Epoch 23 Time: 0.79 min, Train Loss: 0.08898, Train AUC: 0.99169, Train AUPR: 0.96488, Precision: 0.93110, Sensitivity: 0.86281, Specificity: 0.98916
+2026-03-02 13:23:53,477 - Epoch 24 Time: 0.78 min, Train Loss: 0.08353, Train AUC: 0.99279, Train AUPR: 0.96833, Precision: 0.93840, Sensitivity: 0.86423, Specificity: 0.99037
+2026-03-02 13:24:40,082 - Epoch 25 Time: 0.78 min, Train Loss: 0.07774, Train AUC: 0.99355, Train AUPR: 0.97173, Precision: 0.93891, Sensitivity: 0.87203, Specificity: 0.99037
+2026-03-02 13:25:26,835 - Epoch 26 Time: 0.78 min, Train Loss: 0.07434, Train AUC: 0.99411, Train AUPR: 0.97386, Precision: 0.93687, Sensitivity: 0.88071, Specificity: 0.98992
+2026-03-02 13:26:13,650 - Epoch 27 Time: 0.78 min, Train Loss: 0.06778, Train AUC: 0.99481, Train AUPR: 0.97772, Precision: 0.94655, Sensitivity: 0.89137, Specificity: 0.99146
+2026-03-02 13:26:59,401 - Epoch 28 Time: 0.76 min, Train Loss: 0.06589, Train AUC: 0.99510, Train AUPR: 0.97826, Precision: 0.94497, Sensitivity: 0.89111, Specificity: 0.99119
+2026-03-02 13:27:46,542 - Epoch 29 Time: 0.79 min, Train Loss: 0.06253, Train AUC: 0.99566, Train AUPR: 0.98030, Precision: 0.94921, Sensitivity: 0.89872, Specificity: 0.99184
+2026-03-02 13:28:33,167 - Epoch 30 Time: 0.78 min, Train Loss: 0.05838, Train AUC: 0.99615, Train AUPR: 0.98262, Precision: 0.95234, Sensitivity: 0.90848, Specificity: 0.99228
+2026-03-02 13:29:20,647 - Epoch 31 Time: 0.79 min, Train Loss: 0.05653, Train AUC: 0.99619, Train AUPR: 0.98312, Precision: 0.95265, Sensitivity: 0.90774, Specificity: 0.99234
+2026-03-02 13:30:07,645 - Epoch 32 Time: 0.78 min, Train Loss: 0.05010, Train AUC: 0.99704, Train AUPR: 0.98681, Precision: 0.96230, Sensitivity: 0.92106, Specificity: 0.99387
+2026-03-02 13:30:54,636 - Epoch 33 Time: 0.78 min, Train Loss: 0.05097, Train AUC: 0.99699, Train AUPR: 0.98604, Precision: 0.95726, Sensitivity: 0.91781, Specificity: 0.99305
+2026-03-02 13:30:54,652 - Initializing MoleculeDataset !
+2026-03-02 13:31:08,119 - Test Loss: 0.9500
+2026-03-02 13:31:08,119 - Test AUC: 0.9618
+2026-03-02 13:31:08,119 - Test AUPR: 0.9439
+2026-03-02 13:31:08,119 - Test Precision: 0.9672
+2026-03-02 13:31:08,119 - Test Sensitivity (Recall): 0.5700
+2026-03-02 13:31:08,119 - Test Specificity: 0.9804
+2026-03-02 13:31:08,127 - MultiPPIMI model with self, with mlps after flatten
+2026-03-02 13:31:08,183 - Initializing MoleculeDataset !
+2026-03-02 13:31:18,940 - Start training fold5 for 26 epochs !
+2026-03-02 13:32:10,162 - Epoch 1 Time: 0.85 min, Train Loss: 0.70518, Train AUC: 0.65964, Train AUPR: 0.29341, Precision: 0.27767, Sensitivity: 0.43179, Specificity: 0.78949
+2026-03-02 13:33:01,216 - Epoch 2 Time: 0.85 min, Train Loss: 0.60709, Train AUC: 0.81467, Train AUPR: 0.59074, Precision: 0.44863, Sensitivity: 0.61250, Specificity: 0.85893
+2026-03-02 13:33:52,012 - Epoch 3 Time: 0.85 min, Train Loss: 0.52771, Train AUC: 0.87912, Train AUPR: 0.72167, Precision: 0.55675, Sensitivity: 0.67961, Specificity: 0.89861
+2026-03-02 13:34:43,485 - Epoch 4 Time: 0.86 min, Train Loss: 0.45762, Train AUC: 0.91536, Train AUPR: 0.79265, Precision: 0.63753, Sensitivity: 0.72282, Specificity: 0.92298
+2026-03-02 13:35:36,024 - Epoch 5 Time: 0.88 min, Train Loss: 0.39398, Train AUC: 0.93365, Train AUPR: 0.82781, Precision: 0.70799, Sensitivity: 0.73068, Specificity: 0.94353
+2026-03-02 13:36:26,986 - Epoch 6 Time: 0.85 min, Train Loss: 0.34123, Train AUC: 0.94410, Train AUPR: 0.84944, Precision: 0.75419, Sensitivity: 0.72818, Specificity: 0.95552
+2026-03-02 13:37:16,997 - Epoch 7 Time: 0.83 min, Train Loss: 0.29456, Train AUC: 0.95254, Train AUPR: 0.86678, Precision: 0.80046, Sensitivity: 0.73473, Specificity: 0.96568
+2026-03-02 13:38:07,700 - Epoch 8 Time: 0.85 min, Train Loss: 0.25466, Train AUC: 0.96058, Train AUPR: 0.88473, Precision: 0.83420, Sensitivity: 0.74537, Specificity: 0.97224
+2026-03-02 13:38:58,679 - Epoch 9 Time: 0.85 min, Train Loss: 0.21812, Train AUC: 0.96693, Train AUPR: 0.90079, Precision: 0.87192, Sensitivity: 0.75174, Specificity: 0.97931
+2026-03-02 13:39:48,308 - Epoch 10 Time: 0.83 min, Train Loss: 0.19269, Train AUC: 0.97178, Train AUPR: 0.91234, Precision: 0.88156, Sensitivity: 0.76398, Specificity: 0.98076
+2026-03-02 13:40:38,563 - Epoch 11 Time: 0.84 min, Train Loss: 0.17250, Train AUC: 0.97456, Train AUPR: 0.92064, Precision: 0.89412, Sensitivity: 0.77450, Specificity: 0.98281
+2026-03-02 13:41:29,810 - Epoch 12 Time: 0.85 min, Train Loss: 0.15474, Train AUC: 0.97858, Train AUPR: 0.93024, Precision: 0.90505, Sensitivity: 0.78653, Specificity: 0.98454
+2026-03-02 13:42:20,794 - Epoch 13 Time: 0.85 min, Train Loss: 0.13651, Train AUC: 0.98202, Train AUPR: 0.94150, Precision: 0.91707, Sensitivity: 0.80299, Specificity: 0.98639
+2026-03-02 13:43:11,087 - Epoch 14 Time: 0.84 min, Train Loss: 0.12756, Train AUC: 0.98457, Train AUPR: 0.94603, Precision: 0.91746, Sensitivity: 0.81373, Specificity: 0.98628
+2026-03-02 13:44:01,709 - Epoch 15 Time: 0.84 min, Train Loss: 0.11608, Train AUC: 0.98655, Train AUPR: 0.95309, Precision: 0.92270, Sensitivity: 0.82809, Specificity: 0.98700
+2026-03-02 13:44:52,978 - Epoch 16 Time: 0.85 min, Train Loss: 0.10599, Train AUC: 0.98857, Train AUPR: 0.95901, Precision: 0.93177, Sensitivity: 0.84245, Specificity: 0.98844
+2026-03-02 13:45:44,119 - Epoch 17 Time: 0.85 min, Train Loss: 0.09738, Train AUC: 0.99012, Train AUPR: 0.96440, Precision: 0.93620, Sensitivity: 0.85317, Specificity: 0.98910
+2026-03-02 13:46:34,431 - Epoch 18 Time: 0.84 min, Train Loss: 0.09294, Train AUC: 0.99057, Train AUPR: 0.96609, Precision: 0.93467, Sensitivity: 0.86086, Specificity: 0.98872
+2026-03-02 13:47:24,464 - Epoch 19 Time: 0.83 min, Train Loss: 0.08389, Train AUC: 0.99231, Train AUPR: 0.97166, Precision: 0.94285, Sensitivity: 0.87248, Specificity: 0.99009
+2026-03-02 13:48:14,569 - Epoch 20 Time: 0.84 min, Train Loss: 0.08025, Train AUC: 0.99282, Train AUPR: 0.97367, Precision: 0.94245, Sensitivity: 0.88260, Specificity: 0.98990
+2026-03-02 13:49:04,774 - Epoch 21 Time: 0.84 min, Train Loss: 0.07300, Train AUC: 0.99375, Train AUPR: 0.97740, Precision: 0.94965, Sensitivity: 0.89279, Specificity: 0.99113
+2026-03-02 13:49:55,001 - Epoch 22 Time: 0.84 min, Train Loss: 0.06672, Train AUC: 0.99484, Train AUPR: 0.98066, Precision: 0.95416, Sensitivity: 0.89675, Specificity: 0.99193
+2026-03-02 13:50:45,444 - Epoch 23 Time: 0.84 min, Train Loss: 0.06570, Train AUC: 0.99493, Train AUPR: 0.98086, Precision: 0.95515, Sensitivity: 0.89797, Specificity: 0.99210
+2026-03-02 13:51:35,985 - Epoch 24 Time: 0.84 min, Train Loss: 0.06266, Train AUC: 0.99536, Train AUPR: 0.98246, Precision: 0.95548, Sensitivity: 0.90505, Specificity: 0.99210
+2026-03-02 13:52:26,185 - Epoch 25 Time: 0.84 min, Train Loss: 0.05760, Train AUC: 0.99597, Train AUPR: 0.98470, Precision: 0.95802, Sensitivity: 0.91393, Specificity: 0.99250
+2026-03-02 13:53:17,363 - Epoch 26 Time: 0.85 min, Train Loss: 0.05467, Train AUC: 0.99633, Train AUPR: 0.98609, Precision: 0.96282, Sensitivity: 0.91647, Specificity: 0.99337
+2026-03-02 13:53:17,399 - Initializing MoleculeDataset !
+2026-03-02 13:53:28,617 - Test Loss: 0.8916
+2026-03-02 13:53:28,617 - Test AUC: 0.9501
+2026-03-02 13:53:28,617 - Test AUPR: 0.9476
+2026-03-02 13:53:28,617 - Test Precision: 0.9827
+2026-03-02 13:53:28,617 - Test Sensitivity (Recall): 0.5033
+2026-03-02 13:53:28,617 - Test Specificity: 0.9910
+2026-03-02 13:53:28,632 - Starting Experiment 2
+2026-03-02 13:53:28,632 - MultiPPIMI model with self, with mlps after flatten
+2026-03-02 13:53:28,687 - Initializing MoleculeDataset !
+2026-03-02 13:53:40,462 - Start training fold1 for 31 epochs !
+2026-03-02 13:54:32,874 - Epoch 1 Time: 0.87 min, Train Loss: 0.65950, Train AUC: 0.68941, Train AUPR: 0.38983, Precision: 0.33974, Sensitivity: 0.43696, Specificity: 0.82544
+2026-03-02 13:55:25,760 - Epoch 2 Time: 0.88 min, Train Loss: 0.53472, Train AUC: 0.84706, Train AUPR: 0.67145, Precision: 0.55565, Sensitivity: 0.61716, Specificity: 0.89851
+2026-03-02 13:56:19,592 - Epoch 3 Time: 0.90 min, Train Loss: 0.44568, Train AUC: 0.90194, Train AUPR: 0.77180, Precision: 0.67362, Sensitivity: 0.66792, Specificity: 0.93345
+2026-03-02 13:57:12,945 - Epoch 4 Time: 0.89 min, Train Loss: 0.37496, Train AUC: 0.93018, Train AUPR: 0.82746, Precision: 0.75705, Sensitivity: 0.70443, Specificity: 0.95352
+2026-03-02 13:58:06,990 - Epoch 5 Time: 0.90 min, Train Loss: 0.31914, Train AUC: 0.94484, Train AUPR: 0.85732, Precision: 0.81045, Sensitivity: 0.71739, Specificity: 0.96547
+2026-03-02 13:59:01,314 - Epoch 6 Time: 0.91 min, Train Loss: 0.27033, Train AUC: 0.95536, Train AUPR: 0.88086, Precision: 0.85033, Sensitivity: 0.73020, Specificity: 0.97357
+2026-03-02 13:59:55,059 - Epoch 7 Time: 0.90 min, Train Loss: 0.23095, Train AUC: 0.96426, Train AUPR: 0.90056, Precision: 0.87699, Sensitivity: 0.74561, Specificity: 0.97850
+2026-03-02 14:00:47,596 - Epoch 8 Time: 0.88 min, Train Loss: 0.19983, Train AUC: 0.97050, Train AUPR: 0.91527, Precision: 0.89481, Sensitivity: 0.75945, Specificity: 0.98164
+2026-03-02 14:01:41,662 - Epoch 9 Time: 0.90 min, Train Loss: 0.17249, Train AUC: 0.97651, Train AUPR: 0.92986, Precision: 0.91052, Sensitivity: 0.78036, Specificity: 0.98422
+2026-03-02 14:02:35,874 - Epoch 10 Time: 0.90 min, Train Loss: 0.15295, Train AUC: 0.98057, Train AUPR: 0.93949, Precision: 0.91515, Sensitivity: 0.78782, Specificity: 0.98498
+2026-03-02 14:03:29,093 - Epoch 11 Time: 0.89 min, Train Loss: 0.13667, Train AUC: 0.98352, Train AUPR: 0.94754, Precision: 0.92280, Sensitivity: 0.80679, Specificity: 0.98611
+2026-03-02 14:04:21,508 - Epoch 12 Time: 0.87 min, Train Loss: 0.12558, Train AUC: 0.98552, Train AUPR: 0.95274, Precision: 0.92745, Sensitivity: 0.81846, Specificity: 0.98683
+2026-03-02 14:05:13,527 - Epoch 13 Time: 0.87 min, Train Loss: 0.11503, Train AUC: 0.98730, Train AUPR: 0.95815, Precision: 0.92928, Sensitivity: 0.82727, Specificity: 0.98705
+2026-03-02 14:06:07,584 - Epoch 14 Time: 0.90 min, Train Loss: 0.10448, Train AUC: 0.98950, Train AUPR: 0.96450, Precision: 0.93408, Sensitivity: 0.84169, Specificity: 0.98778
+2026-03-02 14:07:00,697 - Epoch 15 Time: 0.89 min, Train Loss: 0.09896, Train AUC: 0.99031, Train AUPR: 0.96664, Precision: 0.93820, Sensitivity: 0.85160, Specificity: 0.98846
+2026-03-02 14:07:52,694 - Epoch 16 Time: 0.87 min, Train Loss: 0.09092, Train AUC: 0.99181, Train AUPR: 0.97070, Precision: 0.94316, Sensitivity: 0.85709, Specificity: 0.98938
+2026-03-02 14:08:45,732 - Epoch 17 Time: 0.88 min, Train Loss: 0.08359, Train AUC: 0.99288, Train AUPR: 0.97465, Precision: 0.94757, Sensitivity: 0.87003, Specificity: 0.99009
+2026-03-02 14:09:40,282 - Epoch 18 Time: 0.91 min, Train Loss: 0.08045, Train AUC: 0.99332, Train AUPR: 0.97597, Precision: 0.94713, Sensitivity: 0.87566, Specificity: 0.98995
+2026-03-02 14:10:34,073 - Epoch 19 Time: 0.90 min, Train Loss: 0.07616, Train AUC: 0.99410, Train AUPR: 0.97823, Precision: 0.94944, Sensitivity: 0.87909, Specificity: 0.99037
+2026-03-02 14:11:27,826 - Epoch 20 Time: 0.90 min, Train Loss: 0.07380, Train AUC: 0.99429, Train AUPR: 0.97927, Precision: 0.94721, Sensitivity: 0.88808, Specificity: 0.98982
+2026-03-02 14:12:21,316 - Epoch 21 Time: 0.89 min, Train Loss: 0.06837, Train AUC: 0.99522, Train AUPR: 0.98187, Precision: 0.95420, Sensitivity: 0.89214, Specificity: 0.99120
+2026-03-02 14:13:14,975 - Epoch 22 Time: 0.89 min, Train Loss: 0.06374, Train AUC: 0.99566, Train AUPR: 0.98406, Precision: 0.95765, Sensitivity: 0.90375, Specificity: 0.99178
+2026-03-02 16:59:54,153 - 02/03 - cold start experiment @ old hypeparameters - senaty check
+2026-03-02 16:59:54,858 - --- Start training! ---
+2026-03-02 16:59:54,858 - Starting Experiment 1
+2026-03-02 16:59:54,858 - MultiPPIMI model with self, with mlps after flatten

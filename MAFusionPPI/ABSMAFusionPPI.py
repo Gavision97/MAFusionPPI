@@ -16,7 +16,6 @@ from utils.eval_tools import EarlyStopping, calc_metrics
 from utils.splitters import scaffold_split
 from utils.MoleculeDataset import MoleculeDataset
 
-
 if torch.cuda.is_available():
     logging.info(f"GPU is available.")
     device = "cuda"
@@ -43,7 +42,7 @@ class ABSMAFusionPPI(ABC, nn.Module):
                     batch_size=32, device='cuda', num_workers=5):
         
         train_dataset = MoleculeDataset(dataset)
-        train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
+        train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, drop_last=True)
         logger.info(f'Start training {fold} for {num_epochs} epochs !')
         for epoch in range(num_epochs):
             start_time = time.time()
@@ -88,14 +87,14 @@ class ABSMAFusionPPI(ABC, nn.Module):
         train_dataset = MoleculeDataset(train_subset)
         val_dataset = MoleculeDataset(val_subset)
 
-        train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
-        val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
+        train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, drop_last=True)
+        val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, drop_last=True)
         logger.info(f'---- train loader size -> {len(train_dataset)}, val loader size {len(val_dataset)} ----')
 
         # custom early stopping object; in order to reduce risk of overfitting
         # on the validation set and improve model generalization ability
         early_stopping = EarlyStopping(mode='max', patience=self.early_stopping_patience,
-                                       warm_up_epochs=self.warm_up_epochs, verbose=True)
+                                       warm_up_epochs=self.warm_up_epochs)
 
         for epoch in range(num_epochs):
             all_preds, all_labels = [], []
@@ -130,8 +129,8 @@ class ABSMAFusionPPI(ABC, nn.Module):
             early_stopping.check_early_stop(val_metrics_dict['AUC'], curr_val_metrics
                                             ,train_auc, epoch)   
             if early_stopping.stop_training:
-                logger.info(f"Early stopping at epoch {epoch+1}. "
-                            f"Best rmse={early_stopping.best_score:.4f} @ epoch {early_stopping.best_epoch+1}")
+                logger.info(f"Early stopping at epoch {epoch}. "
+                            f"Best AUC={early_stopping.best_score:.4f} @ epoch {early_stopping.best_epoch}")
                 train_epoch = early_stopping.best_epoch 
                 break
         
@@ -147,7 +146,7 @@ class ABSMAFusionPPI(ABC, nn.Module):
     def test_model(self, test_dataset, criterion, batch_size, device, num_workers):
 
         test_dataset = MoleculeDataset(test_dataset)
-        test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
+        test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, drop_last=True)
         self.eval()
     
         test_loss, all_labels, all_outputs = 0.0, [], []
