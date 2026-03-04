@@ -9,7 +9,7 @@ import torch.optim as optim
 
 
 from MAFusionPPI.MAFusionPPI import MAFusionPPI
-from utils.tools import plot_train_val_auc
+from utils.tools import plot_train_val_auc, set_seed, seed_worker
 
 DATA_PATH = 'datasets/splits_with_ppimi_test_folds_s3'
 UNIPROT_MAPPING_PATH = 'datasets/idmapping_unip.tsv'
@@ -20,7 +20,7 @@ WEIGHT_DECAY = 1e-3
 DROPOUT = 0.3
 BATCH_SIZE = 64
 NUM_WORKERS = 16
-MAX_N_EPOCHS = 500 # max number of epochs for heldout evaluation with early stopping (default=500)
+MAX_N_EPOCHS = 2 # max number of epochs for heldout evaluation with early stopping (default=500)
 
 if torch.cuda.is_available():
     logging.info(f"GPU is available.")
@@ -31,17 +31,18 @@ else:
 
 
 def preprocess_dataset(curr_df):
+    ''' preprocess curr_df by removing ppi_id column & dropping duplicated rows'''
     return curr_df.drop(columns=['ppi_id']).drop_duplicates()
 
 def hv_scaffold(neg_factor='1', smoo_factor='1', fold=1, exp=1, device='cuda', seed=42):
-    logger.info(f'--- Executing CV with scaffold split with hyperparameters of neg_factor={neg_factor} & smoo_factor={smoo_factor} ...')
+    logger.info(f'--- Executing CV with scaffold split with hyperparameters of neg_factor={neg_factor} & smoo_factor={smoo_factor} (seed={seed}) ...')
 
     fold_dir = os.path.join(DATA_PATH, f"fold{fold}", str(neg_factor), str(smoo_factor))
     train_fp = os.path.join(fold_dir, f"train_fold{fold}_{neg_factor}_{smoo_factor}.csv")
     train_df = preprocess_dataset(pd.read_csv(train_fp))
 
     model = MAFusionPPI(dropout=DROPOUT).to(device=device)
-    model, best_val_metrics_dict, train_aucs, val_aucs = model.heldout_val_model(f"{fold}_{neg_factor}_{smoo_factor}_{exp}", num_epochs=MAX_N_EPOCHS, dataset=train_df,
+    best_model, best_val_metrics_dict, train_aucs, val_aucs = model.heldout_val_model(f"{fold}_{neg_factor}_{smoo_factor}_{exp}", num_epochs=MAX_N_EPOCHS, dataset=train_df,
                                         optimizer=optim.AdamW(model.parameters(), lr=LR, weight_decay=WEIGHT_DECAY),
                                         criterion=nn.BCEWithLogitsLoss(),
                                         batch_size=BATCH_SIZE, device=device, num_workers=NUM_WORKERS, seed=seed)
@@ -60,7 +61,7 @@ def hv_scaffold(neg_factor='1', smoo_factor='1', fold=1, exp=1, device='cuda', s
             ylabel="AUC"
     )
     logger.info(f'--- Saved train vs. val AUC curves to {plots_dir}/{plot_name}_fold_{fold}.png successfullys')
-    return model, best_val_metrics_dict
+    return best_model, best_val_metrics_dict
 
 
 def cold_neg_smoo_eval(neg_factor='1', smoo_factor='1', n=10, device='cuda'):
@@ -91,6 +92,7 @@ def cold_neg_smoo_eval(neg_factor='1', smoo_factor='1', n=10, device='cuda'):
         logger.info (f"---- Start Training & Testing Fold {i} ----")
         for exp_num in range(1, n + 1):
             logger.info(f"experiment {exp_num} ...")
+            set_seed(seed=exp_num) 
             # heldout validation using scaffold splitter & early stopping on the validation set
             best_model, val_metric_dict = hv_scaffold(neg_factor=neg_factor, smoo_factor=smoo_factor, fold=i,
                                                       exp=exp_num, device=device, seed=exp_num)
@@ -105,7 +107,7 @@ def cold_neg_smoo_eval(neg_factor='1', smoo_factor='1', n=10, device='cuda'):
 
             # evaluate best model from heldout evaluation step on the cold test set & return
             # metrics (auc, aupr, etc ..); set save=True in order to save predicted probabilities in csv
-            test_metrics_dict, _ = best_model.test_model(fold=f"{i}_{neg_factor}_{smoo_factor}_{exp_num}", test_dataset=test_df, criterion=nn.BCEWithLogitsLoss(), batch_size=BATCH_SIZE,
+            test_metrics_dict, _ = best_model.test_model(fold=f"{i}_{neg_factor}_{smoo_factor}_{exp_num}", dataset=test_df, criterion=nn.BCEWithLogitsLoss(), batch_size=BATCH_SIZE,
                                          device=device, num_workers=NUM_WORKERS, save=True)
             curr_exp_metric_tuple = (test_metrics_dict['AUC'], test_metrics_dict['AUPR'], test_metrics_dict['Precision'],
                                      test_metrics_dict['Sensitivity'], test_metrics_dict['Specificity'])

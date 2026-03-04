@@ -31,8 +31,6 @@ def cold_neg_smoo_eval_(
     neg_factor = "1",
     smoo_factor= "1",
     n = 10,
-    n_epochs = [50, 50, 50, 50, 50],
-    folds = [1, 2, 3, 4, 5],
     device = 'cuda'
 ):
     """
@@ -49,8 +47,7 @@ def cold_neg_smoo_eval_(
 
     exp_name = f'dataset_neg_fct_{neg_factor}_smoo_fct_{smoo_factor}'
     logger.info(f'--- Start Cold Start Experiments for Dataset -> {exp_name} ---')
-    res_dict, val_metrics_dict = cold_neg_smoo_eval(neg_factor=neg_factor, smoo_factor=smoo_factor, n=n,
-                                                    n_epochs=n_epochs, folds=folds, device=device)
+    res_dict, val_metrics_dict = cold_neg_smoo_eval(neg_factor=neg_factor, smoo_factor=smoo_factor, n=n, device=device)
 
 
     fold_keys = [f"fold{i}" for i in range(1, 6)]    
@@ -113,11 +110,11 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--log_msg", type=str, default='log message', help="First message to display in the log file; for experiment description")
     parser.add_argument("--res_file_name", type=str, default='res', help="name of the result; pandas.DataFrame() object")
-    parser.add_argument("--eval_method", type=str, default='cold', choices=['cv','cv_neg_smoo', 'cold', "mcd"], help="path to the smiles file")
+    parser.add_argument("--eval_method", type=str, default='cv_neg_smoo', choices=['cv','cv_neg_smoo', 'cold', "mcd"], help="path to the smiles file")
     parser.add_argument("--cv_method", type=str, default='all', choices=['all', 'per_fam'], help="The split for 10-fold cross-validation - all data or per RNA subtype ")
     parser.add_argument('--neg_factor', type=str, default='5', choices=['1', '2', '3', '4', '5'], help="negative sampling hyperparameter (e.g., 1, 2 ... 5)")
     parser.add_argument('--smoo_factor', type=str, default='1.0', choices=['0.75', '0.8', '0.9', '0.95', '1.0'], help="")
-    parser.add_argument('--n_exp', type=int, default=10, help="number of experiments for statistically significant evaluation")
+    parser.add_argument('--n_exp', type=int, default=1, help="number of experiments for statistically significant evaluation")
     parser.add_argument('--epo_f1', type=int, default=50, help="number of epochs to train fold 1 (cold eval)")
     parser.add_argument('--epo_f2', type=int, default=50, help="number of epochs to train fold 2 (cold eval)")
     parser.add_argument('--epo_f3', type=int, default=50, help="number of epochs to train fold 3 (cold eval)")
@@ -160,8 +157,7 @@ def main():
         nel = [epo_f1, epo_f2, epo_f3, epo_f4, epo_f5]
         train_test_cold_start_ppi(nel=nel, n=n_exp)
     elif eval_method =='cv_neg_smoo':
-        cold_neg_smoo_eval_(neg_factor=neg_factor, smoo_factor=smoo_factor, res_file_name=res_file_name, n=n_exp,
-                            n_epochs=n_epochs, folds=folds, device=device)
+        cold_neg_smoo_eval_(neg_factor=neg_factor, smoo_factor=smoo_factor, res_file_name=res_file_name, n=n_exp, device=device)
     elif eval_method == 'mcd':
         pass # TODO: finish building mcd pipeline & test it
 

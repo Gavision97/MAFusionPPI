@@ -3497,3 +3497,15 @@
 2026-03-04 17:24:17,114 - Epoch 36 Time: 1.24 min, Train Loss: 0.05598, Train AUC: 0.99800, Train AUPR: 0.99586, Precision: 0.97346, Sensitivity: 0.96134, Specificity: 0.98776
 2026-03-04 17:25:30,743 - Epoch 37 Time: 1.23 min, Train Loss: 0.05169, Train AUC: 0.99819, Train AUPR: 0.99648, Precision: 0.97665, Sensitivity: 0.96528, Specificity: 0.98922
 2026-03-04 17:26:45,035 - Epoch 38 Time: 1.24 min, Train Loss: 0.05210, Train AUC: 0.99825, Train AUPR: 0.99641, Precision: 0.97693, Sensitivity: 0.96428, Specificity: 0.98937
+2026-03-04 17:27:58,844 - Epoch 39 Time: 1.23 min, Train Loss: 0.05051, Train AUC: 0.99821, Train AUPR: 0.99640, Precision: 0.97785, Sensitivity: 0.96964, Specificity: 0.98974
+2026-03-04 17:29:14,343 - Epoch 40 Time: 1.26 min, Train Loss: 0.04820, Train AUC: 0.99841, Train AUPR: 0.99692, Precision: 0.97791, Sensitivity: 0.96743, Specificity: 0.98979
+2026-03-04 17:30:28,515 - Epoch 41 Time: 1.24 min, Train Loss: 0.04622, Train AUC: 0.99847, Train AUPR: 0.99697, Precision: 0.98172, Sensitivity: 0.96721, Specificity: 0.99159
+2026-03-04 17:31:45,219 - Epoch 42 Time: 1.28 min, Train Loss: 0.04707, Train AUC: 0.99845, Train AUPR: 0.99699, Precision: 0.97793, Sensitivity: 0.96833, Specificity: 0.98979
+2026-03-04 17:31:45,233 - Initializing MoleculeDataset !
+2026-03-04 17:32:07,690 - Test Loss: 1.0290
+2026-03-04 17:32:07,690 - Test AUC: 0.9180
+2026-03-04 17:32:07,690 - Test AUPR: 0.9210
+2026-03-04 17:32:07,690 - Test Precision: 0.9562
+2026-03-04 17:32:07,690 - Test Sensitivity (Recall): 0.5189
+2026-03-04 17:32:07,690 - Test Specificity: 0.9759
+2026-03-04 17:32:07,722 - Saved/updated summary to: results/result_tables/cold_eval_neg_smoo_0103.csv

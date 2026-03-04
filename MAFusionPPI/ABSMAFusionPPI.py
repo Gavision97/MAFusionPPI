@@ -9,9 +9,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
-from sklearn.metrics import roc_auc_score
-
-
+from utils.tools import seed_worker, set_seed
 from utils.eval_tools import EarlyStopping, calc_metrics
 from utils.splitters import scaffold_split
 from utils.MoleculeDataset import MoleculeDataset
@@ -24,6 +22,7 @@ else:
     device = "cpu"
 
 RES_TABLES_PATH = 'results/result_tables'
+FRAC_TRAIN = 0.95
 
 class ABSMAFusionPPI(ABC, nn.Module):
     def __init__(self):
@@ -113,15 +112,18 @@ class ABSMAFusionPPI(ABC, nn.Module):
         train_aucs, val_aucs = [], []
         # split using custim scaffold splitter rather than deepchem version; set seed for reproducibility
         # between same N experiments (i.e., all experiments i will use seed=i)
-        train_subset, val_subset = scaffold_split(dataset, smiles_col="smiles", frac_train=0.05, seed=seed)
+        train_subset, val_subset = scaffold_split(dataset, smiles_col="smiles", frac_train=FRAC_TRAIN, seed=seed)
 
         train_dataset = MoleculeDataset(train_subset)
         val_dataset = MoleculeDataset(val_subset)
 
         # drop_last=True in order to avoid bug when batch_size=1 in training phase (BatchNorn1d crashes when batch_size=1)
         # in evaluation, keep drop_last=False in order to retrieve all rows for tracking & analysing performance
+        g = torch.Generator()
+        g.manual_seed(seed)
         train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, drop_last=True, collate_fn=MoleculeDataset.collate_fn)
-        val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, drop_last=False,  collate_fn=MoleculeDataset.collate_fn)
+        val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, drop_last=False,  collate_fn=MoleculeDataset.collate_fn, generator=g, worker_init_fn=seed_worker)
+        logger.info(f'---- train loader size -> {len(train_dataset)}, val loader size {len(val_dataset)} ----')
 
         early_stopping = EarlyStopping(mode="max", patience=self.early_stopping_patience,
                                        warm_up_epochs=self.warm_up_epochs, delta=self.delta)
@@ -172,7 +174,7 @@ class ABSMAFusionPPI(ABC, nn.Module):
 
         # split using custim scaffold splitter rather than deepchem version; set seed for reproducibility
         # between same N experiments (i.e., all experiments i will use seed=i)
-        train_subset, val_subset = scaffold_split(dataset, smiles_col="smiles", frac_train=0.8, seed=seed)
+        train_subset, val_subset = scaffold_split(dataset, smiles_col="smiles", frac_train=FRAC_TRAIN, seed=seed)
 
         train_dataset = MoleculeDataset(train_subset)
         val_dataset = MoleculeDataset(val_subset)

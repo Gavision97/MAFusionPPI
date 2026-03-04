@@ -130,3 +130,71 @@
 2026-03-02 11:28:49,478 - Epoch 5 Time: 4.20 min, Train Loss: 0.31173, Train AUC: 0.94849, Train AUPR: 0.86454, Precision: 0.81950, Sensitivity: 0.72113, Specificity: 0.96733
 2026-03-02 11:33:01,406 - Epoch 6 Time: 4.20 min, Train Loss: 0.26770, Train AUC: 0.95701, Train AUPR: 0.88443, Precision: 0.85390, Sensitivity: 0.73461, Specificity: 0.97416
 2026-03-02 11:37:12,719 - Epoch 7 Time: 4.19 min, Train Loss: 0.22659, Train AUC: 0.96663, Train AUPR: 0.90576, Precision: 0.88407, Sensitivity: 0.74884, Specificity: 0.97980
+2026-03-04 18:01:15,017 - log message
+2026-03-04 18:01:15,636 - --- Start training! ---
+2026-03-04 18:01:15,636 - Starting Experiment 1
+2026-03-04 18:01:15,636 - MultiPPIMI model with self, with mlps after flatten
+2026-03-04 18:01:17,284 - Initializing MoleculeDataset !
+2026-03-04 18:01:37,679 - Start training fold1 for 50 epochs !
+2026-03-04 18:03:23,240 - log message
+2026-03-04 18:04:34,104 - log message
+2026-03-04 18:05:00,376 - log message
+2026-03-04 18:05:00,376 - --- Start Cold Start Experiments for Dataset -> dataset_neg_fct_5_smoo_fct_1.0 ---
+2026-03-04 18:05:00,376 - ---- Start Training & Testing Fold 1 ----
+2026-03-04 18:05:00,376 - experiment 1 ...
+2026-03-04 18:05:00,377 - --- Executing CV with scaffold split with hyperparameters of neg_factor=5 & smoo_factor=1.0 ...
+2026-03-04 18:05:00,500 - MultiPPIMI model with self, with mlps after flatten
+2026-03-04 18:05:33,691 - Initializing MoleculeDataset !
+2026-03-04 18:05:40,062 - Initializing MoleculeDataset !
+2026-03-04 18:10:05,926 - NEW BEST @ epoch 1: train_auc=0.6015, val_auc=0.5449, val_aupr=0.2095, val_precision=0.1861, val_sensitivity=0.5251; val_specificity=0.5268
+2026-03-04 18:18:10,351 - --- Saved train vs. val AUC curves to results/plots/neg_fct_5_smoo_fct_1.0/neg_fct_5_smoo_fct_1.0_fold_1.png successfullys
+2026-03-04 18:21:15,982 - log message
+2026-03-04 18:21:15,982 - --- Start Cold Start Experiments for Dataset -> dataset_neg_fct_5_smoo_fct_1.0 ---
+2026-03-04 18:21:15,982 - ---- Start Training & Testing Fold 1 ----
+2026-03-04 18:21:15,982 - experiment 1 ...
+2026-03-04 18:21:15,982 - --- Executing CV with scaffold split with hyperparameters of neg_factor=5 & smoo_factor=1.0 ...
+2026-03-04 18:21:16,059 - MultiPPIMI model with self, with mlps after flatten
+2026-03-04 18:21:49,383 - Initializing MoleculeDataset !
+2026-03-04 18:22:06,117 - Initializing MoleculeDataset !
+2026-03-04 18:26:31,506 - NEW BEST @ epoch 1: train_auc=0.6713, val_auc=0.8349, val_aupr=0.6154, val_precision=0.3353, val_sensitivity=0.7972; val_specificity=0.6610
+2026-03-04 18:30:45,965 - NEW BEST @ epoch 2: train_auc=0.8521, val_auc=0.8984, val_aupr=0.7093, val_precision=0.4469, val_sensitivity=0.8388; val_specificity=0.7773
+2026-03-04 18:31:00,595 - --- Saved train vs. val AUC curves to results/plots/neg_fct_5_smoo_fct_1.0/neg_fct_5_smoo_fct_1.0_fold_1.png successfullys
+2026-03-04 18:31:00,606 - Initializing MoleculeDataset !
+2026-03-04 18:31:23,333 - Test Loss: 0.7994
+2026-03-04 18:31:23,333 - Test AUC: 0.4964
+2026-03-04 18:31:23,333 - Test AUPR: 0.4996
+2026-03-04 18:31:23,334 - Test Precision: 0.5278
+2026-03-04 18:31:23,334 - Test Sensitivity (Recall): 0.2246
+2026-03-04 18:31:23,335 - Test Specificity: 0.7991
+2026-03-04 18:31:23,345 - ---- Start Training & Testing Fold 2 ----
+2026-03-04 18:31:23,345 - experiment 1 ...
+2026-03-04 18:31:23,345 - --- Executing CV with scaffold split with hyperparameters of neg_factor=5 & smoo_factor=1.0 ...
+2026-03-04 18:31:23,479 - MultiPPIMI model with self, with mlps after flatten
+2026-03-04 18:31:58,757 - Initializing MoleculeDataset !
+2026-03-04 18:32:16,185 - Initializing MoleculeDataset !
+2026-03-04 18:35:07,309 - log message
+2026-03-04 18:35:07,309 - --- Start Cold Start Experiments for Dataset -> dataset_neg_fct_5_smoo_fct_1.0 ---
+2026-03-04 18:35:07,309 - ---- Start Training & Testing Fold 1 ----
+2026-03-04 18:35:07,310 - experiment 1 ...
+2026-03-04 18:35:07,311 - --- Executing CV with scaffold split with hyperparameters of neg_factor=5 & smoo_factor=1.0 (seed=1) ...
+2026-03-04 18:35:07,390 - MultiPPIMI model with self, with mlps after flatten
+2026-03-04 18:35:40,566 - Initializing MoleculeDataset !
+2026-03-04 18:35:57,056 - Initializing MoleculeDataset !
+2026-03-04 18:36:03,437 - ---- train loader size -> 62055, val loader size 3267 ----
+2026-03-04 18:40:10,335 - NEW BEST @ epoch 1: train_auc=0.6801, val_auc=0.8115, val_aupr=0.5900, val_precision=0.3710, val_sensitivity=0.6880; val_specificity=0.7498
+2026-03-04 18:44:25,559 - NEW BEST @ epoch 2: train_auc=0.8439, val_auc=0.8955, val_aupr=0.7059, val_precision=0.4840, val_sensitivity=0.7868; val_specificity=0.8201
+2026-03-04 18:44:39,736 - --- Saved train vs. val AUC curves to results/plots/neg_fct_5_smoo_fct_1.0/neg_fct_5_smoo_fct_1.0_fold_1.png successfullys
+2026-03-04 18:44:39,748 - Initializing MoleculeDataset !
+2026-03-04 18:45:02,335 - Test Loss: 0.8017
+2026-03-04 18:45:02,335 - Test AUC: 0.4790
+2026-03-04 18:45:02,335 - Test AUPR: 0.4857
+2026-03-04 18:45:02,336 - Test Precision: 0.4946
+2026-03-04 18:45:02,336 - Test Sensitivity (Recall): 0.1971
+2026-03-04 18:45:02,337 - Test Specificity: 0.7986
+2026-03-04 18:45:02,347 - ---- Start Training & Testing Fold 2 ----
+2026-03-04 18:45:02,347 - experiment 1 ...
+2026-03-04 18:45:02,347 - --- Executing CV with scaffold split with hyperparameters of neg_factor=5 & smoo_factor=1.0 (seed=1) ...
+2026-03-04 18:45:02,432 - MultiPPIMI model with self, with mlps after flatten
+2026-03-04 18:45:37,963 - Initializing MoleculeDataset !
+2026-03-04 18:45:55,148 - Initializing MoleculeDataset !
+2026-03-04 18:46:01,627 - ---- train loader size -> 67794, val loader size 3570 ----

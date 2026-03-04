@@ -7,6 +7,8 @@ import torch
 import torch.nn as nn
 import matplotlib.pyplot as plt
 
+import random
+import numpy as np
 
 if torch.cuda.is_available():
     logging.info(f"GPU is available.")
@@ -14,6 +16,27 @@ if torch.cuda.is_available():
 else:
     logging.info(f"GPU is not available. Using CPU instead.")
     device = "cpu"
+
+def seed_worker(worker_id):
+    '''for dataloader workers reproducibility'''
+    worker_seed = torch.initial_seed() % 2**32
+    np.random.seed(worker_seed)
+    random.seed(worker_seed)
+
+def set_seed(seed: int):
+    random.seed(seed)
+    os.environ["PYTHONHASHSEED"] = str(seed)
+
+    np.random.seed(seed)
+
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    torch.use_deterministic_algorithms(True)
+
 
 def convert_uniprot_ids(dataset, mapping_df):
     # Create a dictionary from the mapping dataframe
