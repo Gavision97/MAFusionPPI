@@ -114,7 +114,7 @@ def main():
     parser.add_argument("--cv_method", type=str, default='all', choices=['all', 'per_fam'], help="The split for 10-fold cross-validation - all data or per RNA subtype ")
     parser.add_argument('--neg_factor', type=str, default='5', choices=['1', '2', '3', '4', '5'], help="negative sampling hyperparameter (e.g., 1, 2 ... 5)")
     parser.add_argument('--smoo_factor', type=str, default='1.0', choices=['0.75', '0.8', '0.9', '0.95', '1.0'], help="")
-    parser.add_argument('--n_exp', type=int, default=1, help="number of experiments for statistically significant evaluation")
+    parser.add_argument('--n_exp', type=int, default=10, help="number of experiments for statistically significant evaluation")
     parser.add_argument('--epo_f1', type=int, default=50, help="number of epochs to train fold 1 (cold eval)")
     parser.add_argument('--epo_f2', type=int, default=50, help="number of epochs to train fold 2 (cold eval)")
     parser.add_argument('--epo_f3', type=int, default=50, help="number of epochs to train fold 3 (cold eval)")

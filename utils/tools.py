@@ -8,6 +8,7 @@ import torch.nn as nn
 import matplotlib.pyplot as plt
 
 import random
+import pandas as pd
 import numpy as np
 
 if torch.cuda.is_available():

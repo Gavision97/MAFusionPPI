@@ -12,7 +12,7 @@ from torch.utils.data import DataLoader
 from utils.tools import seed_worker, set_seed
 from utils.eval_tools import EarlyStopping, calc_metrics
 from utils.splitters import scaffold_split
-from utils.MoleculeDataset import MoleculeDataset
+from utils.MoleculeDataset import TrainMoleculeDataset, EvalMoleculeDataset
 
 if torch.cuda.is_available():
     logging.info(f"GPU is available.")
@@ -45,7 +45,7 @@ class ABSMAFusionPPI(ABC, nn.Module):
         train_loss = 0.0
         all_labels, all_outputs = [], []
 
-        for inputs, y, _ in train_loader:
+        for inputs, y in train_loader:
             inputs = [inp.to(device) for inp in inputs]
             y = y.to(device)
 
@@ -72,12 +72,14 @@ class ABSMAFusionPPI(ABC, nn.Module):
 
 
     def train_model(self, fold, num_epochs, dataset, optimizer, criterion, 
-                    batch_size=32, device='cuda', num_workers=5):
+                    batch_size=32, device='cuda', num_workers=5, seed=42):
         
-        train_dataset = MoleculeDataset(dataset)
+        train_dataset = TrainMoleculeDataset(dataset)
 
         # drop_last=True in order to avoid bug when batch_size=1 in training phase (BatchNorn1d crashes when batch_size=1)
-        train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, drop_last=True, collate_fn=MoleculeDataset.collate_fn)
+        g = torch.Generator()
+        g.manual_seed(seed)
+        train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, drop_last=True, generator=g, worker_init_fn=seed_worker)
         
         logger.info(f'Start training {fold} for {num_epochs} epochs !')
         for epoch in range(num_epochs):
@@ -114,15 +116,15 @@ class ABSMAFusionPPI(ABC, nn.Module):
         # between same N experiments (i.e., all experiments i will use seed=i)
         train_subset, val_subset = scaffold_split(dataset, smiles_col="smiles", frac_train=FRAC_TRAIN, seed=seed)
 
-        train_dataset = MoleculeDataset(train_subset)
-        val_dataset = MoleculeDataset(val_subset)
+        train_dataset = TrainMoleculeDataset(train_subset)
+        val_dataset = EvalMoleculeDataset(val_subset)
 
         # drop_last=True in order to avoid bug when batch_size=1 in training phase (BatchNorn1d crashes when batch_size=1)
         # in evaluation, keep drop_last=False in order to retrieve all rows for tracking & analysing performance
         g = torch.Generator()
         g.manual_seed(seed)
-        train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, drop_last=True, collate_fn=MoleculeDataset.collate_fn)
-        val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, drop_last=False,  collate_fn=MoleculeDataset.collate_fn, generator=g, worker_init_fn=seed_worker)
+        train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, drop_last=True, generator=g, worker_init_fn=seed_worker)
+        val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=0, drop_last=False,  collate_fn=EvalMoleculeDataset.collate_eval)
         logger.info(f'---- train loader size -> {len(train_dataset)}, val loader size {len(val_dataset)} ----')
 
         early_stopping = EarlyStopping(mode="max", patience=self.early_stopping_patience,
@@ -176,13 +178,15 @@ class ABSMAFusionPPI(ABC, nn.Module):
         # between same N experiments (i.e., all experiments i will use seed=i)
         train_subset, val_subset = scaffold_split(dataset, smiles_col="smiles", frac_train=FRAC_TRAIN, seed=seed)
 
-        train_dataset = MoleculeDataset(train_subset)
-        val_dataset = MoleculeDataset(val_subset)
+        train_dataset = TrainMoleculeDataset(train_subset)
+        val_dataset = EvalMoleculeDataset(val_subset)
 
         # drop_last=True in order to avoid bug when batch_size=1 in training phase (BatchNorn1d crashes when batch_size=1)
         # in evaluation, keep drop_last=False in order to retrieve all rows for tracking & analysing performance
-        train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, drop_last=True, collate_fn=MoleculeDataset.collate_fn)
-        val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, drop_last=False, collate_fn=MoleculeDataset.collate_fn)
+        g = torch.Generator()
+        g.manual_seed(seed)
+        train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, drop_last=True, generator=g, worker_init_fn=seed_worker)
+        val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=0, drop_last=False, collate_fn=EvalMoleculeDataset.collate_eval)
         logger.info(f'---- train loader size -> {len(train_dataset)}, val loader size {len(val_dataset)} ----')
 
         # custom early stopping object; in order to reduce risk of overfitting
@@ -224,10 +228,10 @@ class ABSMAFusionPPI(ABC, nn.Module):
 
     def test_model(self, fold, dataset, criterion, batch_size, device, num_workers, save=False):
 
-        test_dataset = MoleculeDataset(dataset)
+        test_dataset = EvalMoleculeDataset(dataset)
         # in evaluation, keep drop_last=False in order to retrieve all rows for tracking & analysing performance
         test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, 
-                                 num_workers=num_workers, drop_last=False, collate_fn=MoleculeDataset.collate_fn)
+                                 num_workers=0, drop_last=False, collate_fn=EvalMoleculeDataset.collate_eval)
 
         if not save:
             test_metrics_dict, test_loss = self.validate_model(test_loader, criterion, device, return_rows=False)

@@ -19,8 +19,8 @@ LR = 1e-5
 WEIGHT_DECAY = 1e-3
 DROPOUT = 0.3
 BATCH_SIZE = 64
-NUM_WORKERS = 16
-MAX_N_EPOCHS = 2 # max number of epochs for heldout evaluation with early stopping (default=500)
+NUM_WORKERS = 6
+MAX_N_EPOCHS = 500 # max number of epochs for heldout evaluation with early stopping (default=500)
 
 if torch.cuda.is_available():
     logging.info(f"GPU is available.")

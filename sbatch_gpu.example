@@ -10,7 +10,7 @@
 #SBATCH --job-name research_project			### name of the job
 #SBATCH --output job-%J.out			### output log for running job - %J for job number
 #SBATCH --error job-%J.err
-#SBATCH --gpus=rtx_6000:1				### number of GPUs, allocating more than 1 requires IT team's permission. Example to request 3090 gpu: #SBATCH --gpus=1
+#SBATCH --gpus=rtx_4090:1				### number of GPUs, allocating more than 1 requires IT team's permission. Example to request 3090 gpu: #SBATCH --gpus=1
 
 # Note: the following 4 lines are commented out
 
@@ -30,6 +30,8 @@ module load anaconda				### load anaconda module (must be present when working w
 module load cuda/12.1
 source activate chemprop				### activate a conda environment, replace my_env with your conda environme
 
+export CUBLAS_WORKSPACE_CONFIG=:4096:8
+
 # Check CUDA version
 nvcc --version
 
@@ -38,5 +40,5 @@ nvidia-smi
 					### this command executes jupyter lab – replace with your own command
 #python mcd_job3.py
 #jupyter lab
-python main.py --eval_method 'cv_neg_smoo' --n_exp 10 --n_epochs 83 88 42 88 71 --folds 2 3 4 5 --log_msg "01/03 - cold start evaluation @ negative factor=2, smoothing factor=1.0" --neg_factor "2" --smoo_factor "1.0"  --res_file_name "cold_eval_neg_smoo_0103" --log_file_name "cold_eval_neg_2_smoo_1.0" --device 'cuda'
+python main.py --eval_method 'cv_neg_smoo' --n_exp 10 --log_msg "01/03 - cold start evaluation @ negative factor=2, smoothing factor=1.0" --neg_factor "2" --smoo_factor "1.0"  --res_file_name "cold_eval_neg_smoo_0103" --log_file_name "res" --device 'cuda'
 #python main.py --eval_method 'cold' --n_exp 10 --epo_f1 31 --epo_f2 28 --epo_f3 34 --epo_f4 33 --epo_f5 26 --log_msg "02/03 - cold start experiment @ old hypeparameters - senaty check" --log_file_name "0203_cold_eval_old" --device 'cuda'

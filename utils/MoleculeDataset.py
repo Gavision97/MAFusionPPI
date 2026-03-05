@@ -10,24 +10,109 @@ from torch.utils.data import Dataset, DataLoader
 PPI_EMB_PATH = 'embeddings/ppi/'
 SMI_EMB_PATH = 'embeddings/smi/'
 
-class MoleculeDataset(Dataset):
-    """
-    Returns:
-      inputs (list of tensors), y (tensor)
 
-    inputs = [
-        chemprop_features,      # (F1,)
-        esm_features_ppi,       # (F2,)
-        fegs_features_ppi,      # (F3,)
-        gae_features_ppi,       # (F4,)
-        chemberta_features,     # (F5,)
-        morgan_fingerprint,     # (1024,)
-        chemical_descriptors    # (194,)
-    ]
-    y = label (float32)
+class BaseMoleculeDataset(Dataset):
+    """
+    Loads & preprocesses all PPI + SMILES features once.
+    Subclasses control what __getitem__ returns (train vs eval).
     """
     def __init__(self, ds_):
-        logger.info('Initializing MoleculeDataset !')
+        self.data = ds_.reset_index(drop=True)
+
+        # ---- PPI features ----
+        self.esm  = pd.read_csv(os.path.join(PPI_EMB_PATH, "esm_features.csv"))
+        self.fegs = pd.read_csv(os.path.join(PPI_EMB_PATH, "fegs_features.csv"))
+        self.gae  = pd.read_csv(os.path.join(PPI_EMB_PATH, "gae_features.csv"))
+
+        self.gae_features_ppi  = self._merge_ppi(self.data, self.gae).drop(columns=["smiles", "label"]).to_numpy(np.float32)
+        self.esm_features_ppi  = self._merge_ppi(self.data, self.esm).drop(columns=["smiles", "label"]).to_numpy(np.float32)
+        self.fegs_features_ppi = self._merge_ppi(self.data, self.fegs).drop(columns=["smiles", "label"]).to_numpy(np.float32)
+
+        # ---- SMILES features ----
+        self.smiles_morgan_fingerprints = pd.read_csv(os.path.join(SMI_EMB_PATH, "smiles_morgan_fingerprints_dataset.csv"))
+        self.smiles_chemical_descriptors = pd.read_csv(os.path.join(SMI_EMB_PATH, "smiles_chem_descriptors_mapping_dataset.csv"))
+        self.chemprop = pd.read_csv(os.path.join(SMI_EMB_PATH, "chemprop_features.csv"))
+        self.chemberta = pd.read_csv(os.path.join(SMI_EMB_PATH, "chemBERTa_features.csv"))
+
+        # fast lookup maps
+        self.morgan_map = self.smiles_morgan_fingerprints.set_index("SMILES")
+        self.desc_map = self.smiles_chemical_descriptors.set_index("SMILES")
+        self.chemprop_map = self.chemprop.set_index("SMILES")
+        self.chemberta_map = self.chemberta.set_index("SMILES")
+
+    def _merge_ppi(self, dataset, features_df):
+        out = dataset.merge(features_df, how="left", left_on="uniprot_id1", right_on="UniProt_ID",
+                            suffixes=("", "_id1")).drop(columns=["UniProt_ID"])
+
+        features_df_renamed = features_df.add_suffix("_id2").rename(columns={"UniProt_ID_id2": "UniProt_ID"})
+        out = out.merge(features_df_renamed, how="left", left_on="uniprot_id2", right_on="UniProt_ID",
+                        suffixes=("", "_id2")).drop(columns=["UniProt_ID", "uniprot_id1", "uniprot_id2"])
+        
+        out.fillna(0, inplace=True) # fill missing values (na, None etc..) with zero
+        return out
+
+    def __len__(self):
+        return len(self.data)
+
+    def _get_inputs_y_meta(self, idx):
+        """Shared sample construction. Returns tensors + meta tuple."""
+        smiles = self.data.loc[idx, "smiles"]
+        uniprot1 = self.data.loc[idx, "uniprot_id1"]
+        uniprot2 = self.data.loc[idx, "uniprot_id2"]
+        meta = (smiles, uniprot1, uniprot2)
+        y = torch.tensor(self.data.loc[idx, "label"], dtype=torch.float32)
+
+        # PPI features
+        esm_features  = torch.from_numpy(self.esm_features_ppi[idx])
+        fegs_features = torch.from_numpy(self.fegs_features_ppi[idx])
+        gae_features  = torch.from_numpy(self.gae_features_ppi[idx])
+
+        # SMILES features
+        morgan   = torch.from_numpy(self.morgan_map.loc[smiles].to_numpy(np.float32))
+        chem_desc= torch.from_numpy(self.desc_map.loc[smiles].to_numpy(np.float32))
+        chemprop = torch.from_numpy(self.chemprop_map.loc[smiles].to_numpy(np.float32))
+        chemberta= torch.from_numpy(self.chemberta_map.loc[smiles].to_numpy(np.float32))
+
+        inputs = [chemprop, esm_features, fegs_features, gae_features, chemberta, morgan, chem_desc]
+        return inputs, y, meta
+
+
+class TrainMoleculeDataset(BaseMoleculeDataset):
+    def __getitem__(self, idx):
+        inputs, y, _ = self._get_inputs_y_meta(idx)
+        return inputs, y
+    
+
+class EvalMoleculeDataset(BaseMoleculeDataset):
+    def __getitem__(self, idx):
+        return self._get_inputs_y_meta(idx)
+
+    @staticmethod
+    def collate_eval(batch):
+        inputs_list, ys, metas = zip(*batch)
+        features_by_type = list(zip(*inputs_list))
+        stacked_inputs = [torch.stack(feats, 0) for feats in features_by_type]
+        y = torch.stack(ys, 0)
+        smiles, uniprot1, uniprot2 = zip(*metas)
+        return stacked_inputs, y, (smiles, uniprot1, uniprot2)
+
+
+
+
+
+
+
+
+
+
+
+
+class MoleculeDataset(Dataset):
+    """
+    custom dataset; loads & preprocess all PPI & small molecule features
+    """
+    def __init__(self, ds_):
+        logger.info('Initializing MoleculeDataset ...')
         self.data = ds_.reset_index(drop=True)  # cols -> smiles, uniprot1, uniprot2, label
 
         # PPI features
@@ -52,50 +137,38 @@ class MoleculeDataset(Dataset):
         self.chemprop = pd.read_csv(os.path.join(SMI_EMB_PATH, 'chemprop_features.csv'))
         self.chemberta = pd.read_csv(os.path.join(SMI_EMB_PATH, 'chemBERTa_features.csv'))
 
+        # build indexes for fast lookup in __getittem__(...)
+        self.morgan_map   = self.smiles_morgan_fingerprints.set_index("SMILES")
+        self.desc_map     = self.smiles_chemical_descriptors.set_index("SMILES")
+        self.chemprop_map = self.chemprop.set_index("SMILES")
+        self.chemberta_map= self.chemberta.set_index("SMILES")
+
     def merge_datasets(self, dataset, features_df):
-        dataset = dataset.merge(
-            features_df, how='left',
-            left_on='uniprot_id1', right_on='UniProt_ID',
-            suffixes=('', '_id1')
-        ).drop(columns=['UniProt_ID'])
+        dataset = dataset.merge(features_df, how='left', left_on='uniprot_id1', right_on='UniProt_ID',
+                                suffixes=('', '_id1')).drop(columns=['UniProt_ID'])
 
         features_df_renamed = features_df.add_suffix('_id2').rename(columns={'UniProt_ID_id2': 'UniProt_ID'})
-        dataset = dataset.merge(
-            features_df_renamed, how='left',
-            left_on='uniprot_id2', right_on='UniProt_ID',
-            suffixes=('', '_id2')
-        ).drop(columns=['UniProt_ID', 'uniprot_id1', 'uniprot_id2'])
-
-        # keep your "zero_count" trick
-        dataset['zero_count'] = (dataset == 0).any(axis=1).astype(int)
-        count = 1
-        for index in dataset.index:
-            if dataset.at[index, 'zero_count'] == 1:
-                dataset.at[index, 'zero_count'] = count
-                count += 1
+        dataset = dataset.merge(features_df_renamed, how='left', left_on='uniprot_id2', right_on='UniProt_ID',
+                                suffixes=('', '_id2')).drop(columns=['UniProt_ID', 'uniprot_id1', 'uniprot_id2'])
 
         dataset.fillna(0, inplace=True)
         return dataset.drop(columns=['zero_count'])
 
     @staticmethod
-    def collate_fn(batch):
-        """
-        batch: list of (inputs, y, meta)
-        inputs: list of tensors/arrays (per feature type)
-        y: tensor scalar
-        meta: (smiles, uniprot1, uniprot2)
-        """
-        inputs_list, ys, metas = zip(*batch)      # metas is tuple of tuples
+    def collate_train(batch):
+        inputs_list, ys, _metas = zip(*batch)
         features_by_type = list(zip(*inputs_list))
+        stacked_inputs = [torch.stack([torch.as_tensor(f) for f in feats], 0) for feats in features_by_type]
+        y = torch.stack(ys, 0)
+        return stacked_inputs, y
 
-        # ensure all are tensors
-        stacked_inputs = [
-            torch.stack([torch.as_tensor(f) for f in feats], dim=0)
-            for feats in features_by_type
-        ]
-        y = torch.stack(ys, dim=0)                # (B,)
-
-        smiles, uniprot1, uniprot2 = zip(*metas)  # each is length B tuple of strings
+    @staticmethod
+    def collate_eval(batch):
+        inputs_list, ys, metas = zip(*batch)
+        features_by_type = list(zip(*inputs_list))
+        stacked_inputs = [torch.stack([torch.as_tensor(f) for f in feats], 0) for feats in features_by_type]
+        y = torch.stack(ys, 0)
+        smiles, uniprot1, uniprot2 = zip(*metas)
         return stacked_inputs, y, (smiles, uniprot1, uniprot2)
 
     def make_loader(self, batch_size=32, shuffle=True, num_workers=0, pin_memory=True):
@@ -123,15 +196,25 @@ class MoleculeDataset(Dataset):
         fegs_features = torch.from_numpy(self.fegs_features_ppi.iloc[idx].values.astype(np.float32))
         gae_features = torch.from_numpy(self.gae_features_ppi.iloc[idx].values.astype(np.float32))
 
-        morgan = self.smiles_morgan_fingerprints.loc[self.smiles_morgan_fingerprints['SMILES'] == smiles].iloc[0, 1:].values.astype(np.float32)
-        chem_desc = self.smiles_chemical_descriptors.loc[self.smiles_chemical_descriptors['SMILES'] == smiles].iloc[0, 1:].values.astype(np.float32)
-        chemprop = self.chemprop.loc[self.smiles_chemical_descriptors['SMILES'] == smiles].iloc[0, 1:].values.astype(np.float32)
-        chemberta = self.chemberta.loc[self.smiles_chemical_descriptors['SMILES'] == smiles].iloc[0, 1:].values.astype(np.float32)
-
+        # used predefined indeces for fast lookup 
+        morgan   = self.morgan_map.loc[smiles].to_numpy(np.float32)
+        chem_desc= self.desc_map.loc[smiles].to_numpy(np.float32)
+        chemprop = self.chemprop_map.loc[smiles].to_numpy(np.float32)
+        chemberta= self.chemberta_map.loc[smiles].to_numpy(np.float32)
+        
         inputs = [chemprop, esm_features, fegs_features, gae_features, chemberta, morgan, chem_desc]
         return inputs, y, meta
 
 
+
+
+
+
+
+
+
+
+#####################################################333
 class MoleculeDataset__(Dataset):
     def __init__(self, ds_):
         logger.info('Initializing MoleculeDataset !')
@@ -271,3 +354,22 @@ class MCDMoleculeDataset(Dataset):
         
         return (chemprop_features, esm_features, fegs_features, gae_features, 
                 chemberta_features, morgan_fingerprint, chemical_descriptors, label)
+
+
+'''
+# In case we want to drop duplicates inside
+# MolecularDataset(...), we'll create unique_id 
+# column for rows that have full-zero-vector,
+# in order to not drop them, because they might
+# not be duplicated (same smiles, uniprot_id1, uniprot_id2)
+# jsut same zero-vecrtor-feature
+
+dataset['zero_count'] = (dataset == 0).any(axis=1).astype(int)
+count = 1
+for index in dataset.index:
+    if dataset.at[index, 'zero_count'] == 1:
+        dataset.at[index, 'zero_count'] = count
+        count += 1
+dataset.drop_duplicates(inplace=True)
+'''
+
