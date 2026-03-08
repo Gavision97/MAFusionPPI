@@ -22,6 +22,10 @@ BATCH_SIZE = 64
 NUM_WORKERS = 6
 MAX_N_EPOCHS = 500 # max number of epochs for heldout evaluation with early stopping (default=500)
 
+# same scaffold splitter seed across all folds & experiments
+# (folds have different split, thus no need to use different seed across folds)
+SCAFFOLD_SPLIT_SEED = 42 # same scaffold splitter seed across all folds & experiments (folds are have different split)
+
 if torch.cuda.is_available():
     logging.info(f"GPU is available.")
     device = "cuda"
@@ -95,7 +99,7 @@ def cold_neg_smoo_eval(neg_factor='1', smoo_factor='1', n=10, device='cuda'):
             set_seed(seed=exp_num) 
             # heldout validation using scaffold splitter & early stopping on the validation set
             best_model, val_metric_dict = hv_scaffold(neg_factor=neg_factor, smoo_factor=smoo_factor, fold=i,
-                                                      exp=exp_num, device=device, seed=exp_num)
+                                                      exp=exp_num, device=device, seed=SCAFFOLD_SPLIT_SEED)
             curr_exp_val_metric_tuple = (val_metric_dict['AUC'], val_metric_dict['AUPR'],
                                          val_metric_dict['Precision'], val_metric_dict['Sensitivity'])
             val_res_dict[f'fold{i}'].append(curr_exp_val_metric_tuple)

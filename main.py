@@ -143,6 +143,7 @@ def main():
     folds = args.folds
     device = args.device
 
+    logger.info(log_msg)
 
     # constract log file in order to log the results
     log_dir = os.path.join("results", "logs")
@@ -151,8 +152,7 @@ def main():
     logging.basicConfig(filename=log_path, level=logging.INFO,
                         format='%(asctime)s - %(message)s', force=True)
     
-    
-    logger.info(log_msg)
+    # choose experiment & execute
     if eval_method == 'cold':
         nel = [epo_f1, epo_f2, epo_f3, epo_f4, epo_f5]
         train_test_cold_start_ppi(nel=nel, n=n_exp)
