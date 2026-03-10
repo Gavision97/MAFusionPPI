@@ -9,7 +9,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
-from utils.tools import seed_worker, set_seed
+from utils.tools import seed_worker
 from utils.eval_tools import EarlyStopping, calc_metrics
 from utils.splitters import scaffold_split
 from utils.MoleculeDataset import TrainMoleculeDataset, EvalMoleculeDataset
@@ -30,12 +30,12 @@ class ABSMAFusionPPI(ABC, nn.Module):
         self.true_threshold = 0.5 # same as state-of-the-art frameworks
 
         # early stopping hyperparameters
-        self.early_stopping_patience = 10
+        self.early_stopping_patience = 15
         self.warm_up_epochs = 10
-        self.delta = 0.003
+        self.delta = 0.002
 
     @abstractmethod
-    def forward(self, cpe, esm, fegs, gae, cbae, morgan_fingerprints, chemical_descriptors):
+    def forward(self, **inputs):
         pass
     
     
@@ -46,12 +46,12 @@ class ABSMAFusionPPI(ABC, nn.Module):
         all_labels, all_outputs = [], []
 
         for inputs, y in train_loader:
-            inputs = [inp.to(device) for inp in inputs]
+            inputs = {k: v.to(device) for k, v in inputs.items()}
             y = y.to(device)
 
             optimizer.zero_grad()
 
-            outputs = self(*inputs)
+            outputs = self(**inputs)
             logits = outputs.view(-1)
             targets = y.view(-1).float()
 
@@ -267,10 +267,10 @@ class ABSMAFusionPPI(ABC, nn.Module):
         val_rows = [] if return_rows else None
 
         for inputs, y, meta in val_loader:
-            inputs = [inp.to(device) for inp in inputs]
+            inputs = {k: v.to(device) for k, v in inputs.items()}
             y = y.to(device)
 
-            outputs = self(*inputs)
+            outputs = self(**inputs)
             logits = outputs.view(-1)
             targets = y.view(-1).float()
 

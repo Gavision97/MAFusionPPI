@@ -9,7 +9,7 @@ import torch.optim as optim
 
 
 from MAFusionPPI.MAFusionPPI import MAFusionPPI
-from utils.tools import plot_train_val_auc, set_seed, seed_worker
+from utils.tools import plot_train_val_auc, set_seed
 
 DATA_PATH = 'datasets/splits_with_ppimi_test_folds_s3'
 UNIPROT_MAPPING_PATH = 'datasets/idmapping_unip.tsv'
@@ -43,9 +43,10 @@ def hv_scaffold(neg_factor='1', smoo_factor='1', fold=1, exp=1, device='cuda', s
 
     fold_dir = os.path.join(DATA_PATH, f"fold{fold}", str(neg_factor), str(smoo_factor))
     train_fp = os.path.join(fold_dir, f"train_fold{fold}_{neg_factor}_{smoo_factor}.csv")
-    train_df = preprocess_dataset(pd.read_csv(train_fp))
+    #train_df = preprocess_dataset(pd.read_csv(train_fp))
+    train_df = pd.read_csv(train_fp)
 
-    model = MAFusionPPI(dropout=DROPOUT).to(device=device)
+    model = MAFusionPPI().to(device=device)
     best_model, best_val_metrics_dict, train_aucs, val_aucs = model.heldout_val_model(f"{fold}_{neg_factor}_{smoo_factor}_{exp}", num_epochs=MAX_N_EPOCHS, dataset=train_df,
                                         optimizer=optim.AdamW(model.parameters(), lr=LR, weight_decay=WEIGHT_DECAY),
                                         criterion=nn.BCEWithLogitsLoss(),
@@ -106,8 +107,8 @@ def cold_neg_smoo_eval(neg_factor='1', smoo_factor='1', n=10, device='cuda'):
 
             fold_name = f"fold{i}_{neg_factor}_{smoo_factor}"
             fold_dir = os.path.join(DATA_PATH, f'fold{i}', str(neg_factor), str(smoo_factor))
-            test_df  = preprocess_dataset(pd.read_csv(os.path.join(fold_dir, f"test_{fold_name}.csv")))
-            
+            #test_df  = preprocess_dataset(pd.read_csv(os.path.join(fold_dir, f"test_{fold_name}.csv")))
+            test_df = pd.read_csv(os.path.join(fold_dir, f"test_{fold_name}.csv"))
 
             # evaluate best model from heldout evaluation step on the cold test set & return
             # metrics (auc, aupr, etc ..); set save=True in order to save predicted probabilities in csv

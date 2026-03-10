@@ -4,22 +4,30 @@ logger = logging.getLogger(__name__)
 
 import pandas as pd
 import numpy as np
+import h5py
+import random
 import torch
 from torch.utils.data import Dataset, DataLoader
 
 PPI_EMB_PATH = 'embeddings/ppi/'
 SMI_EMB_PATH = 'embeddings/smi/'
 
+PPI_STRUCT_EMB_H5_PATH = 'embeddings/ppi struct/'
 
 class BaseMoleculeDataset(Dataset):
     """
     Loads & preprocesses all PPI + SMILES features once.
     Subclasses control what __getitem__ returns (train vs eval).
     """
-    def __init__(self, ds_):
+    def __init__(self, ds_, struct_dataset='dataset1', strategy = "conditional", aug=False):
         self.data = ds_.reset_index(drop=True)
 
         # ---- PPI features ----
+        ppi_struct_emb_path = os.path.join(PPI_STRUCT_EMB_H5_PATH, f"{struct_dataset}_processed_matrix_data.h5")
+        self.ppi_struct_emb = h5py.File(ppi_struct_emb_path, "r") # PPI structure embeddings stored in h5py object
+        self.ppi_stuct_strategy = strategy if strategy in ['conditional', 'full_mean', 'subset_mean'] else 'conditional'
+        self.aug = aug
+
         self.esm  = pd.read_csv(os.path.join(PPI_EMB_PATH, "esm_features.csv"))
         self.fegs = pd.read_csv(os.path.join(PPI_EMB_PATH, "fegs_features.csv"))
         self.gae  = pd.read_csv(os.path.join(PPI_EMB_PATH, "gae_features.csv"))
@@ -41,7 +49,8 @@ class BaseMoleculeDataset(Dataset):
         self.chemberta_map = self.chemberta.set_index("SMILES")
 
     def _merge_ppi(self, dataset, features_df):
-        out = dataset.merge(features_df, how="left", left_on="uniprot_id1", right_on="UniProt_ID",
+        dataset_ = dataset.drop(columns=['ppi_id'])
+        out = dataset_.merge(features_df, how="left", left_on="uniprot_id1", right_on="UniProt_ID",
                             suffixes=("", "_id1")).drop(columns=["UniProt_ID"])
 
         features_df_renamed = features_df.add_suffix("_id2").rename(columns={"UniProt_ID_id2": "UniProt_ID"})
@@ -59,10 +68,25 @@ class BaseMoleculeDataset(Dataset):
         smiles = self.data.loc[idx, "smiles"]
         uniprot1 = self.data.loc[idx, "uniprot_id1"]
         uniprot2 = self.data.loc[idx, "uniprot_id2"]
-        meta = (smiles, uniprot1, uniprot2)
+        ppi_id = self.data.loc[idx, "ppi_id"] # get PPI ID in order to extract structure embedding 
+        meta = (smiles, uniprot1, uniprot2, ppi_id)
         y = torch.tensor(self.data.loc[idx, "label"], dtype=torch.float32)
 
-        # PPI features
+        # --------- PPI features --------- #
+        # strcutre embeddings
+        ppi_conformer_id = '1' # w/o data augmentation, take first PPI conformation
+        if self.aug:
+            # get PPI conformer ID from conformation pool (5 conformers for each PPI)
+            ppi_conformer_id = random.choice(list(self.ppi_struct_emb[self.ppi_stuct_strategy].keys())) 
+
+        # ['mean_ifeature_omega_a', 'mean_ifeature_omega_b', 'mean_ppi_former_a', 'mean_ppi_former_b', 'progres_vector']
+        ppi_former_a_features = torch.from_numpy(self.ppi_struct_emb[self.ppi_stuct_strategy][ppi_conformer_id][ppi_id]['mean_ppi_former_a'][:]).float()
+        ppi_former_b_features = torch.from_numpy(self.ppi_struct_emb[self.ppi_stuct_strategy][ppi_conformer_id][ppi_id]['mean_ppi_former_b'][:]).float()
+
+        #ean_ifeatures_omega_a = torch.from_numpy(self.ppi_struct_emb[self.ppi_stuct_strategy][ppi_conformer_id][ppi_id]['mean_ifeatures_omega_a'][:]).float()
+        #mean_ifeatures_omega_b = torch.from_numpy(self.ppi_struct_emb[self.ppi_stuct_strategy][ppi_conformer_id][ppi_id]['mean_ifeatures_omega_b'][:]).float()
+
+
         esm_features  = torch.from_numpy(self.esm_features_ppi[idx])
         fegs_features = torch.from_numpy(self.fegs_features_ppi[idx])
         gae_features  = torch.from_numpy(self.gae_features_ppi[idx])
@@ -73,7 +97,18 @@ class BaseMoleculeDataset(Dataset):
         chemprop = torch.from_numpy(self.chemprop_map.loc[smiles].to_numpy(np.float32))
         chemberta= torch.from_numpy(self.chemberta_map.loc[smiles].to_numpy(np.float32))
 
-        inputs = [chemprop, esm_features, fegs_features, gae_features, chemberta, morgan, chem_desc]
+        inputs = {
+            "ppi_former_a": ppi_former_a_features,
+            "ppi_former_b": ppi_former_b_features,
+            "cpe": chemprop,
+            "esm": esm_features,
+            "fegs": fegs_features,
+            "gae": gae_features,
+            "cbae": chemberta,
+            "morgan_fingerprints": morgan,
+            "chemical_descriptors": chem_desc,
+        }
+
         return inputs, y, meta
 
 
@@ -81,7 +116,24 @@ class TrainMoleculeDataset(BaseMoleculeDataset):
     def __getitem__(self, idx):
         inputs, y, _ = self._get_inputs_y_meta(idx)
         return inputs, y
-    
+
+    @staticmethod
+    def collate_train(batch):
+        """
+        Collate training batch into:
+            inputs_dict, y
+        where each tensor in inputs_dict is stacked over batch dimension.
+        """
+        inputs_list, ys = zip(*batch)
+
+        keys = inputs_list[0].keys()
+        stacked_inputs = {
+            k: torch.stack([sample[k] for sample in inputs_list], dim=0)
+            for k in keys
+        }
+        y = torch.stack(ys, dim=0)
+        return stacked_inputs, y
+
 
 class EvalMoleculeDataset(BaseMoleculeDataset):
     def __getitem__(self, idx):
@@ -89,23 +141,21 @@ class EvalMoleculeDataset(BaseMoleculeDataset):
 
     @staticmethod
     def collate_eval(batch):
+        """
+        Collate evaluation batch into:
+            inputs_dict, y, (smiles, uniprot1, uniprot2)
+        """
         inputs_list, ys, metas = zip(*batch)
-        features_by_type = list(zip(*inputs_list))
-        stacked_inputs = [torch.stack(feats, 0) for feats in features_by_type]
-        y = torch.stack(ys, 0)
-        smiles, uniprot1, uniprot2 = zip(*metas)
+
+        keys = inputs_list[0].keys()
+        stacked_inputs = {
+            k: torch.stack([sample[k] for sample in inputs_list], dim=0)
+            for k in keys
+        }
+        y = torch.stack(ys, dim=0)
+
+        smiles, uniprot1, uniprot2, ppi_id = zip(*metas)
         return stacked_inputs, y, (smiles, uniprot1, uniprot2)
-
-
-
-
-
-
-
-
-
-
-
 
 class MoleculeDataset(Dataset):
     """
