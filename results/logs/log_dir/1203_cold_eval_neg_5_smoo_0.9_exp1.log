@@ -1,0 +1,16 @@
+2026-03-12 14:53:33,229 - --- Start Cold Start Experiments for Dataset -> dataset_neg_fct_5_smoo_fct_0.9_1 ---
+2026-03-12 14:53:33,230 - ---- Start Training & Testing Fold 1 ----
+2026-03-12 14:53:33,230 - experiment 1 ...
+2026-03-12 14:53:33,233 - --- Executing CV with scaffold split with hyperparameters of neg_factor=5 & smoo_factor=0.9 (seed=42) ...
+2026-03-12 14:53:33,612 - MultiPPIMI model with self, with mlps after flatten & Structure Features (old)
+2026-03-12 14:54:08,833 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug=False
+2026-03-12 14:54:32,365 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug=False
+2026-03-12 14:54:38,550 - ---- train loader size -> 62757, val loader size 3303 ----
+2026-03-12 14:55:27,508 - NEW BEST @ epoch 1: train_auc=0.6953, val_auc=0.7991, val_aupr=0.5689, val_precision=0.3432, val_sensitivity=0.7066; val_specificity=0.7041
+2026-03-12 14:56:15,630 - NEW BEST @ epoch 2: train_auc=0.8588, val_auc=0.8992, val_aupr=0.7083, val_precision=0.4931, val_sensitivity=0.7841; val_specificity=0.8236
+2026-03-12 14:57:03,355 - NEW BEST @ epoch 3: train_auc=0.9106, val_auc=0.9255, val_aupr=0.7618, val_precision=0.5924, val_sensitivity=0.7622; val_specificity=0.8852
+2026-03-12 14:57:48,945 - NEW BEST @ epoch 4: train_auc=0.9386, val_auc=0.9396, val_aupr=0.7984, val_precision=0.6768, val_sensitivity=0.7167; val_specificity=0.9251
+2026-03-12 14:58:36,546 - NEW BEST @ epoch 5: train_auc=0.9545, val_auc=0.9527, val_aupr=0.8335, val_precision=0.7601, val_sensitivity=0.6948; val_specificity=0.9520
+2026-03-12 14:59:25,272 - NEW BEST @ epoch 6: train_auc=0.9639, val_auc=0.9601, val_aupr=0.8604, val_precision=0.8065, val_sensitivity=0.7167; val_specificity=0.9624
+2026-03-12 15:00:14,334 - NEW BEST @ epoch 7: train_auc=0.9707, val_auc=0.9658, val_aupr=0.8774, val_precision=0.8223, val_sensitivity=0.7336; val_specificity=0.9653
+2026-03-12 15:01:00,654 - NEW BEST @ epoch 8: train_auc=0.9765, val_auc=0.9704, val_aupr=0.8941, val_precision=0.8299, val_sensitivity=0.7487; val_specificity=0.9664

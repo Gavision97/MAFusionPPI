@@ -1,4 +1,5 @@
 import os
+import glob
 import logging
 logger = logging.getLogger(__name__) # get logger name
 
@@ -8,18 +9,20 @@ import torch.nn as nn
 import torch.optim as optim
 
 
-from MAFusionPPI.MAFusionPPI_ import MFusionPPI
-from utils.tools import plot_train_val_auc, set_seed
+from MAFusionPPI.MAFusionPPI import MAFusionPPI, MFusionPPI
+from utils.tools import plot_train_val_auc, set_seed, preprocess_dataset
 
-DATA_PATH = 'datasets/splits_with_ppimi_test_folds_s3_corrected_'
+#DATA_PATH = 'datasets/splits_with_ppimi_test_folds_s3_corrected_'
+DATA_PATH = 'datasets/train_test_5_0.75'
+#DATA_PATH = 'datasets/cold_both_folds'
 UNIPROT_MAPPING_PATH = 'datasets/idmapping_unip.tsv'
 
 # best hyperparameters; extracted from ablation study & vast hyperparameter search
-LR = 1e-5
-WEIGHT_DECAY = 1e-3
+LR = 1e-5 # 0.00005
+WEIGHT_DECAY = 1e-3 # 0.001
 DROPOUT = 0.3
 BATCH_SIZE = 64
-NUM_WORKERS = 6
+NUM_WORKERS = 6 
 MAX_N_EPOCHS = 500 # max number of epochs for heldout evaluation with early stopping (default=500)
 
 # same scaffold splitter seed across all folds & experiments
@@ -34,55 +37,42 @@ else:
     device = "cpu"
 
 
-
-def preprocess_dataset(curr_df):
-    ''' preprocess curr_df by removing ppi_id column & dropping duplicated rows'''
-    return curr_df.drop(columns=['ppi_id']).drop_duplicates()
-
-def hv_scaffold(use_struct=True, save_probs=False, neg_factor='1', smoo_factor='1', strct_dataset='dataset1',
-                       strct_strategy='conditional', strct_aug_train=False,
+def hv_scaffold(use_struct=True, save_probs=False, strct_dataset='dataset1', strct_strategy='conditional', strct_aug_train=False,
                         strct_aug_eval=False, fold=1, exp=1, job_id='date@j1', device='cuda', seed=42):
-    logger.info(f'--- Executing CV with scaffold split with hyperparameters of neg_factor={neg_factor} & smoo_factor={smoo_factor} (seed={seed}) ...')
+    logger.info(f'--- Executing CV with scaffold split with hyperparameters: use_struct={use_struct}, save_probs={save_probs}, seed={seed} ...')
 
-    
-    fold_dir = os.path.join(DATA_PATH, f"fold{fold}", str(neg_factor), str(smoo_factor))
-    #fold_dir = DATA_PATH # for cold start both PPI & small molecule
-
-    train_fp = os.path.join(fold_dir, f"train_fold{fold}_{neg_factor}_{smoo_factor}.csv")
-    #train_df = preprocess_dataset(pd.read_csv(train_fp))
+    train_fp = glob.glob(os.path.join(DATA_PATH, f"train_fold{fold}_*.csv"))[0] # catch files like 'trian_fold2_5_0.9.csv'
     train_df = pd.read_csv(train_fp)
 
-        # initialize model w or w/o strucure features
+    # initialize model w or w/o strucure features
     if use_struct:
-        model = MFusionPPI().to(device=device)
+        model = MAFusionPPI().to(device=device)
     else:
         train_df = preprocess_dataset(pd.read_csv(train_fp)) # drop 'ppi_id' column & duplicates
         model = MFusionPPI().to(device=device)
-    best_model, best_val_metrics_dict, train_aucs, val_aucs = model.heldout_val_model(f"{job_id}_{fold}_{neg_factor}_{smoo_factor}_{exp}", use_struct=use_struct, num_epochs=MAX_N_EPOCHS, dataset=train_df,
+
+    best_model, best_val_metrics_dict, train_aucs, val_aucs = model.heldout_val_model(f"{job_id}_{fold}_{exp}", use_struct=use_struct, num_epochs=MAX_N_EPOCHS, dataset=train_df,
                                                                                       strct_dataset=strct_dataset, strct_strategy=strct_strategy, strct_aug_train=strct_aug_train, 
                                                                                       strct_aug_eval=strct_aug_eval, optimizer=optim.AdamW(model.parameters(), lr=LR, weight_decay=WEIGHT_DECAY),
-                                                                                      criterion=nn.BCEWithLogitsLoss(), is_neg_smoo=True, save_probs=save_probs, batch_size=BATCH_SIZE, device=device, num_workers=NUM_WORKERS, seed=seed)
+                                                                                      criterion=nn.BCEWithLogitsLoss(), is_neg_smoo=False, save_probs=save_probs, batch_size=BATCH_SIZE, device=device, num_workers=NUM_WORKERS, seed=seed)
     
-
     # plot train vs. validation AUC over epochs
-    plot_name = f'neg_fct_{neg_factor}_smoo_fct_{smoo_factor}'
-    date, job_id = job_id.split('@') # ['date', 'job_id'] e.g. ['1403', 'j4']
-    plots_dir = os.path.join("results", "plots", date, job_id, f"{plot_name}")
+    date, job_id = job_id.split('@') # ['date', 'job_id'] e.g. [''1403', 'j4']
+    plots_dir = os.path.join("results", "plots", date, job_id)
     os.makedirs(plots_dir, exist_ok=True)
     plot_train_val_auc(
             train_values=train_aucs,
             val_values=val_aucs,
-            save_path=f"{plots_dir}/{plot_name}_fold_{fold}.png",
+            save_path=f"{plots_dir}/fold_{fold}.png",
             title="Train vs. Val AUC Over Time",
             xlabel="Training Steps (epochs)",
             ylabel="AUC"
     )
-    logger.info(f'--- Saved train vs. val AUC curves to {plots_dir}/{plot_name}_fold_{fold}.png successfullys')
+    logger.info(f'--- Saved train vs. val AUC curves to {plots_dir}/fold_{fold}.png successfullys')
     return best_model, best_val_metrics_dict
 
 
-def cold_neg_smoo_eval(use_struct=True, save_probs=False, neg_factor='1', smoo_factor='1', strct_dataset='dataset1',
-                       strct_strategy='conditional', strct_aug_train=False,
+def cv_cold_eval(use_struct=True, save_probs=False, strct_dataset='dataset1',strct_strategy='conditional', strct_aug_train=False,
                         strct_aug_eval=False, n=10, job_id='date@j1', device='cuda'):
     '''
     Cold start setting evaluation for dataset with some negative sampling factor 
@@ -113,24 +103,23 @@ def cold_neg_smoo_eval(use_struct=True, save_probs=False, neg_factor='1', smoo_f
             logger.info(f"experiment {exp_num} ...")
             set_seed(seed=exp_num) 
             # heldout validation using scaffold splitter & early stopping on the validation set
-            best_model, val_metric_dict = hv_scaffold(use_struct=use_struct, save_probs=save_probs, neg_factor=neg_factor, smoo_factor=smoo_factor, strct_dataset=strct_dataset,
-                                                      strct_strategy=strct_strategy, strct_aug_train=strct_aug_train,
+            best_model, val_metric_dict = hv_scaffold(use_struct=use_struct, save_probs=save_probs, strct_dataset=strct_dataset, strct_strategy=strct_strategy, strct_aug_train=strct_aug_train,
                                                       strct_aug_eval=strct_aug_eval, fold=i, exp=exp_num, job_id=job_id, 
                                                       device=device, seed=SCAFFOLD_SPLIT_SEED)
             curr_exp_val_metric_tuple = (val_metric_dict['AUC'], val_metric_dict['AUPR'],
                                          val_metric_dict['Precision'], val_metric_dict['Sensitivity'])
             val_res_dict[f'fold{i}'].append(curr_exp_val_metric_tuple)
 
-            fold_name = f"fold{i}_{neg_factor}_{smoo_factor}"
-            fold_dir = os.path.join(DATA_PATH, f'fold{i}', str(neg_factor), str(smoo_factor))
-            #test_df  = preprocess_dataset(pd.read_csv(os.path.join(fold_dir, f"test_{fold_name}.csv")))
-            test_df = pd.read_csv(os.path.join(fold_dir, f"test_{fold_name}.csv"))
+
+            test_fp = glob.glob(os.path.join(DATA_PATH, f"train_fold{i}_*.csv"))[0] # catch files like 'trian_fold2_5_0.9.csv'
+            #test_df  = preprocess_dataset(test_fp)
+            test_df = pd.read_csv(test_fp)
 
             # evaluate best model from heldout evaluation step on the cold test set & return
             # metrics (auc, aupr, etc ..); set save=True in order to save predicted probabilities in csv
-            test_metrics_dict, _ = best_model.test_model(fold=f"{job_id}_{i}_{neg_factor}_{smoo_factor}_{exp_num}", use_struct=use_struct, dataset=test_df,
+            test_metrics_dict, _ = best_model.test_model(fold=f"{job_id}_{i}_{exp_num}", use_struct=use_struct, dataset=test_df,
                                                          strct_dataset=strct_dataset, strct_strategy=strct_strategy, eval_all_confs=strct_aug_eval, criterion=nn.BCEWithLogitsLoss(),
-                                                         is_neg_smoo=True, save_probs=save_probs, batch_size=BATCH_SIZE, device=device, num_workers=NUM_WORKERS)
+                                                         is_neg_smoo=False, save_probs=save_probs, batch_size=BATCH_SIZE, device=device, num_workers=NUM_WORKERS)
             curr_exp_metric_tuple = (test_metrics_dict['AUC'], test_metrics_dict['AUPR'], test_metrics_dict['Precision'],
                                      test_metrics_dict['Sensitivity'], test_metrics_dict['Specificity'])
             test_res_dict[f'fold{i}'].append(curr_exp_metric_tuple)

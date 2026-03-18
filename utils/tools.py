@@ -18,6 +18,8 @@ else:
     logging.info(f"GPU is not available. Using CPU instead.")
     device = "cpu"
 
+RES_TABLES_PATH = 'results/result_tables/'
+
 def seed_worker(worker_id):
     '''for dataloader workers reproducibility'''
     worker_seed = torch.initial_seed() % 2**32
@@ -37,6 +39,33 @@ def set_seed(seed: int):
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
     torch.use_deterministic_algorithms(True)
+
+def preprocess_dataset(curr_df):
+    ''' preprocess curr_df by removing ppi_id column & dropping duplicated rows'''
+    if 'ppi_id' in list(curr_df.columns):
+        return curr_df.drop(columns=['ppi_id']).drop_duplicates()
+    else:
+        return curr_df.drop_duplicates()
+
+
+def get_out_dir(fold_name, is_neg_smoo = False):
+        fold_splitted_name = fold_name.split("_")
+        if is_neg_smoo:
+            # fold format -> f'{job_id}_{fold_id}_{neg_factor}_{smoo_factor}_{exp_num}'
+            job_id, fold_id, neg_factor, smoo_factor, exp_num = (fold_splitted_name[0], fold_splitted_name[1], 
+                                                            fold_splitted_name[2], fold_splitted_name[3], fold_splitted_name[4])
+            
+            # save evaluation results in results/date/job_id/results_tables/cold_neg_{i}_smoo_{j}/{fold_k}/exp_{x}/test_exp_{x}.csv
+            date, job_id = job_id.split("@") # ['date', 'job_id']
+            out_dir = os.path.join(RES_TABLES_PATH, date, job_id, f"cold_neg_{neg_factor}_smoo_{smoo_factor}", fold_id, f"exp_{exp_num}")
+        else:
+            # save evaluation results in results/date/job_id/results_tables/{fold_k}/exp_{x}/test_exp_{x}.csv
+            job_id, fold_id, exp_num = (fold_splitted_name[0], fold_splitted_name[1], fold_splitted_name[2])
+            date, job_id = job_id.split("@") # ['date', 'job_id']
+            out_dir = os.path.join(RES_TABLES_PATH, date, job_id, fold_id, f"exp_{exp_num}")
+        
+        return out_dir, exp_num
+
 
 
 def convert_uniprot_ids(dataset, mapping_df):
@@ -113,3 +142,35 @@ class custom_self_attention(nn.Module):
         attn_output = self.norm_layer(attn_output)  # Apply LayerNorm
  
         return attn_output # shape -> (batch_size, num_modalities, embed_dim), as in CAT-DTI paper
+    
+
+
+class FeatureReducer_(nn.Module):
+    # Feature reducer for joint attention in PPI structure feature - in order to reduce tensors dim for math operations
+    # Use this class if |UniProt_NumOfAminoAcidComp| < 128
+    def __init__(self, in_channels, out_channels):
+        super(FeatureReducer_, self).__init__()
+        self.conv = nn.Conv1d(in_channels, out_channels, kernel_size=1)
+    
+    def forward(self, x):
+        # x shape: [batch_size, sequence_length, in_channels]
+        x = x.transpose(1, 2)  # Change shape to [batch_size, in_channels, sequence_length]
+        x = self.conv(x)       
+        x = x.transpose(1, 2)  # Change shape back to [batch_size, target_length, out_channels]
+        return x
+        
+class FeatureReducer(nn.Module):
+    # Feature reducer for joint attention in PPI structure feature - in order to reduce tensors dim for math operations
+    # Use this class if |UniProt_NumOfAminoAcidComp| >= 128
+    def __init__(self, in_channels, out_channels, target_length):
+        super(FeatureReducer, self).__init__()
+        self.conv = nn.Conv1d(in_channels, out_channels, kernel_size=1)
+        self.pool = nn.AdaptiveAvgPool1d(target_length)
+    
+    def forward(self, x):
+        # x shape: [batch_size, sequence_length, in_channels]
+        x = x.transpose(1, 2)  # Change shape to [batch_size, in_channels, sequence_length]
+        x = self.conv(x)    
+        x = self.pool(x) 
+        x = x.transpose(1, 2)  # Change shape back to [batch_size, target_length, out_channels]
+        return x

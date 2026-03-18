@@ -11,6 +11,8 @@ from torch.utils.data import Dataset, DataLoader
 
 PPI_EMB_PATH = 'embeddings/ppi/'
 SMI_EMB_PATH = 'embeddings/smi/'
+PPI_INFO_PATH = 'datasets/ppi_strcuture_information_with_id.csv'
+
 
 PPI_STRUCT_EMB_H5_PATH = 'embeddings/ppi struct/'
 
@@ -19,14 +21,26 @@ class BaseMoleculeDataset(Dataset):
     Loads & preprocesses all PPI + SMILES features once.
     Subclasses control what __getitem__ returns (train vs eval).
     """
-    def __init__(self, ds_, struct_dataset='dataset1', strategy = "conditional", aug=False):
+    def __init__(self, ds_, use_struct=True, struct_dataset='dataset1', strategy = "conditional", aug_train=False, eval_all_confs=False):
+       
+        if aug_train and eval_all_confs:
+            raise ValueError("aug_train and eval_all_confs should not both be True.")
+        
+        logger.info(f'MolecularDataset hyperparamets -> dataset={struct_dataset}, trategy={strategy}, aug train={aug_train}, aug eval={eval_all_confs}')
         self.data = ds_.reset_index(drop=True)
+        self.use_struct = use_struct
+        # ----------------- PPI features ----------------- #
+        if use_struct:
+            ppi_struct_emb_path = os.path.join(PPI_STRUCT_EMB_H5_PATH, f"{struct_dataset}_processed_matrix_data.h5")
+            self.ppi_struct_emb = h5py.File(ppi_struct_emb_path, "r") # PPI structure embeddings stored in h5py object
+            self.ppi_stuct_strategy = strategy if strategy in ['conditional', 'full_mean', 'subset_mean'] else 'conditional'
+            self.aug_train = aug_train
+            self.eval_all_confs = eval_all_confs
 
-        # ---- PPI features ----
-        ppi_struct_emb_path = os.path.join(PPI_STRUCT_EMB_H5_PATH, f"{struct_dataset}_processed_matrix_data.h5")
-        self.ppi_struct_emb = h5py.File(ppi_struct_emb_path, "r") # PPI structure embeddings stored in h5py object
-        self.ppi_stuct_strategy = strategy if strategy in ['conditional', 'full_mean', 'subset_mean'] else 'conditional'
-        self.aug = aug
+            self.ppi_info_df = pd.read_csv(PPI_INFO_PATH)
+            self.af3_model2indx = {'model0': '1', 'model1': '2', 'model2': '3', 'model3': '4', 'model4': '5'}
+            self.best_conf_by_ppi = self._build_best_conf_map(struct_dataset)
+
 
         self.esm  = pd.read_csv(os.path.join(PPI_EMB_PATH, "esm_features.csv"))
         self.fegs = pd.read_csv(os.path.join(PPI_EMB_PATH, "fegs_features.csv"))
@@ -36,7 +50,7 @@ class BaseMoleculeDataset(Dataset):
         self.esm_features_ppi  = self._merge_ppi(self.data, self.esm).drop(columns=["smiles", "label"]).to_numpy(np.float32)
         self.fegs_features_ppi = self._merge_ppi(self.data, self.fegs).drop(columns=["smiles", "label"]).to_numpy(np.float32)
 
-        # ---- SMILES features ----
+        # --------------------- SMILES features ------------------
         self.smiles_morgan_fingerprints = pd.read_csv(os.path.join(SMI_EMB_PATH, "smiles_morgan_fingerprints_dataset.csv"))
         self.smiles_chemical_descriptors = pd.read_csv(os.path.join(SMI_EMB_PATH, "smiles_chem_descriptors_mapping_dataset.csv"))
         self.chemprop = pd.read_csv(os.path.join(SMI_EMB_PATH, "chemprop_features.csv"))
@@ -49,7 +63,7 @@ class BaseMoleculeDataset(Dataset):
         self.chemberta_map = self.chemberta.set_index("SMILES")
 
     def _merge_ppi(self, dataset, features_df):
-        dataset_ = dataset.drop(columns=['ppi_id'])
+        dataset_ = dataset.drop(columns=['ppi_id']) if 'ppi_id' in list(dataset.columns) else dataset
         out = dataset_.merge(features_df, how="left", left_on="uniprot_id1", right_on="UniProt_ID",
                             suffixes=("", "_id1")).drop(columns=["UniProt_ID"])
 
@@ -63,54 +77,155 @@ class BaseMoleculeDataset(Dataset):
     def __len__(self):
         return len(self.data)
 
+
+    def _build_best_conf_map(self, struct_dataset: str) -> dict:
+        """
+        Build mapping:
+            ppi_id -> h5 conformer index ('1'..'5')
+
+        based on columns like:
+            dataset1_model_0_ranking, ..., dataset1_model_4_ranking
+        """
+
+        ranking_cols = [f"{struct_dataset}_model_{i}_ranking" for i in range(5)]
+
+        # make sure all needed columns exist
+        missing_cols = [c for c in ranking_cols if c not in self.ppi_info_df.columns]
+        if missing_cols:
+            raise ValueError(f"Missing ranking columns in ppi_info_df: {missing_cols}")
+
+        if "ppi_id" not in self.ppi_info_df.columns:
+            raise ValueError("ppi_info_df must contain a 'ppi_id' column")
+
+        best_conf_by_ppi = {}
+
+        for _, row in self.ppi_info_df.iterrows():
+            ppi_id = row["ppi_id"]
+
+            ranks = row[ranking_cols]
+            ranks = pd.to_numeric(ranks, errors="coerce")
+
+            # if all missing -> fallback to first conformation
+            if ranks.isna().all():
+                best_conf_by_ppi[ppi_id] = '1'
+                continue
+
+            best_col = ranks.idxmax()   # higher is better (e.g. "dataset1_model_3_ranking")
+            # extract model number from column name; "dataset1_model_3_ranking" -> "model3"
+            model_token = best_col.split("_model_")[1].split("_ranking")[0]   # "3"
+            model_name = f"model{model_token}"                                 # "model3"
+    
+            best_conf_by_ppi[ppi_id] = self.af3_model2indx[model_name] # map to h5 conformer index
+
+        return best_conf_by_ppi
+
     def _get_inputs_y_meta(self, idx):
-        """Shared sample construction. Returns tensors + meta tuple."""
         smiles = self.data.loc[idx, "smiles"]
         uniprot1 = self.data.loc[idx, "uniprot_id1"]
         uniprot2 = self.data.loc[idx, "uniprot_id2"]
-        ppi_id = self.data.loc[idx, "ppi_id"] # get PPI ID in order to extract structure embedding 
-        meta = (smiles, uniprot1, uniprot2, ppi_id)
+        meta = (smiles, uniprot1, uniprot2, 'w/o ppi_id') # in case there is no usage of strcture features
         y = torch.tensor(self.data.loc[idx, "label"], dtype=torch.float32)
 
-        # --------- PPI features --------- #
-        # strcutre embeddings
-        ppi_conformer_id = '1' # w/o data augmentation, take first PPI conformation
-        if self.aug:
-            # get PPI conformer ID from conformation pool (5 conformers for each PPI)
-            ppi_conformer_id = random.choice(list(self.ppi_struct_emb[self.ppi_stuct_strategy].keys())) 
+        # ---------- structure embeddings ---------- #
+        if self.use_struct:
+            ppi_id = self.data.loc[idx, "ppi_id"]
+            meta = (smiles, uniprot1, uniprot2, ppi_id)
+            if self.eval_all_confs: # for evaluation (can spacify whether to use data-augmentation for inference/evaluation)
+                ppi_former_all, ppi_omega_all, ppi_progress_all = self._get_all_conformation_struct_features(ppi_id)
+            else:
+                if self.aug_train:
+                    ppi_conformer_id = random.choice(list(self.ppi_struct_emb[self.ppi_stuct_strategy].keys()))
+                else:
+                    ppi_conformer_id = self.best_conf_by_ppi.get(ppi_id, '1')
+                    #print(f'{ppi_id} -> {ppi_conformer_id}')
+                grp = self.ppi_struct_emb[self.ppi_stuct_strategy][ppi_conformer_id][ppi_id]
+                
+                # ppi former emb
+                ppi_former_a, ppi_former_b = torch.from_numpy(grp['mean_ppi_former_a'][:]).float(), torch.from_numpy(grp['mean_ppi_former_b'][:]).float()
+                ppi_former_all = torch.cat([ppi_former_a, ppi_former_b], dim=0)  # (256,)
 
-        # ['mean_ifeature_omega_a', 'mean_ifeature_omega_b', 'mean_ppi_former_a', 'mean_ppi_former_b', 'progres_vector']
-        ppi_former_a_features = torch.from_numpy(self.ppi_struct_emb[self.ppi_stuct_strategy][ppi_conformer_id][ppi_id]['mean_ppi_former_a'][:]).float()
-        ppi_former_b_features = torch.from_numpy(self.ppi_struct_emb[self.ppi_stuct_strategy][ppi_conformer_id][ppi_id]['mean_ppi_former_b'][:]).float()
+                # alpha omega emb
+                omega_a, omega_b = torch.from_numpy(grp['mean_ifeature_omega_a'][:]).float(), torch.from_numpy(grp['mean_ifeature_omega_b'][:]).float()
+                ppi_omega_all = torch.cat([omega_a, omega_b], dim=0)              # (256,)
 
-        #ean_ifeatures_omega_a = torch.from_numpy(self.ppi_struct_emb[self.ppi_stuct_strategy][ppi_conformer_id][ppi_id]['mean_ifeatures_omega_a'][:]).float()
-        #mean_ifeatures_omega_b = torch.from_numpy(self.ppi_struct_emb[self.ppi_stuct_strategy][ppi_conformer_id][ppi_id]['mean_ifeatures_omega_b'][:]).float()
+                # ppi progress emb (one per single PPI)
+                ppi_progress_all = torch.from_numpy(grp['progres_vector'][:]).float()
 
-
+        # ------------------------------------------- #
         esm_features  = torch.from_numpy(self.esm_features_ppi[idx])
         fegs_features = torch.from_numpy(self.fegs_features_ppi[idx])
         gae_features  = torch.from_numpy(self.gae_features_ppi[idx])
 
-        # SMILES features
-        morgan   = torch.from_numpy(self.morgan_map.loc[smiles].to_numpy(np.float32))
-        chem_desc= torch.from_numpy(self.desc_map.loc[smiles].to_numpy(np.float32))
-        chemprop = torch.from_numpy(self.chemprop_map.loc[smiles].to_numpy(np.float32))
-        chemberta= torch.from_numpy(self.chemberta_map.loc[smiles].to_numpy(np.float32))
+        morgan    = torch.from_numpy(self.morgan_map.loc[smiles].to_numpy(np.float32))
+        chem_desc = torch.from_numpy(self.desc_map.loc[smiles].to_numpy(np.float32))
+        chemprop  = torch.from_numpy(self.chemprop_map.loc[smiles].to_numpy(np.float32))
+        chemberta = torch.from_numpy(self.chemberta_map.loc[smiles].to_numpy(np.float32))
 
-        inputs = {
-            "ppi_former_a": ppi_former_a_features,
-            "ppi_former_b": ppi_former_b_features,
-            "cpe": chemprop,
-            "esm": esm_features,
-            "fegs": fegs_features,
-            "gae": gae_features,
-            "cbae": chemberta,
-            "morgan_fingerprints": morgan,
-            "chemical_descriptors": chem_desc,
-        }
+        if self.use_struct:
+            if self.eval_all_confs:
+                inputs = {
+                    "ppi_former": ppi_former_all,         
+                    "ppi_omega": ppi_omega_all,          
+                    "ppi_progress_vec": ppi_progress_all,     
+                    "cpe": chemprop,
+                    "esm": esm_features,
+                    "fegs": fegs_features,
+                    "gae": gae_features,
+                    "cbae": chemberta,
+                    "morgan_fingerprints": morgan,
+                    "chemical_descriptors": chem_desc,
+                }
+            else:
+                inputs = {
+                    "ppi_former": ppi_former_all,
+                    "ppi_omega": ppi_omega_all,
+                    "ppi_progress_vec": ppi_progress_all,
+                    "cpe": chemprop,
+                    "esm": esm_features,
+                    "fegs": fegs_features,
+                    "gae": gae_features,
+                    "cbae": chemberta,
+                    "morgan_fingerprints": morgan,
+                    "chemical_descriptors": chem_desc,
+                }
+        else:
+                inputs = {
+                    "cpe": chemprop,
+                    "esm": esm_features,
+                    "fegs": fegs_features,
+                    "gae": gae_features,
+                    "cbae": chemberta,
+                    "morgan_fingerprints": morgan,
+                    "chemical_descriptors": chem_desc,
+                }
 
         return inputs, y, meta
 
+    def _get_all_conformation_struct_features(self, ppi_id):
+        former_list = []
+        omega_list = []
+        progress_list = []
+
+        conf_ids = sorted(list(self.ppi_struct_emb[self.ppi_stuct_strategy].keys()), key=int)
+
+        for conf_id in conf_ids:
+            grp = self.ppi_struct_emb[self.ppi_stuct_strategy][conf_id][ppi_id]
+
+            ppi_former_a = torch.from_numpy(grp['mean_ppi_former_a'][:]).float()
+            ppi_former_b = torch.from_numpy(grp['mean_ppi_former_b'][:]).float()
+            ppi_former = torch.cat([ppi_former_a, ppi_former_b], dim=0)  
+
+            omega_a = torch.from_numpy(grp['mean_ifeature_omega_a'][:]).float()
+            omega_b = torch.from_numpy(grp['mean_ifeature_omega_b'][:]).float()
+            ppi_omega = torch.cat([omega_a, omega_b], dim=0)              
+
+            progress = torch.from_numpy(grp['progres_vector'][:]).float() 
+
+            former_list.append(ppi_former)
+            omega_list.append(ppi_omega)
+            progress_list.append(progress)
+
+        return (torch.stack(former_list, dim=0), torch.stack(omega_list, dim=0), torch.stack(progress_list, dim=0))
 
 class TrainMoleculeDataset(BaseMoleculeDataset):
     def __getitem__(self, idx):
@@ -155,7 +270,7 @@ class EvalMoleculeDataset(BaseMoleculeDataset):
         y = torch.stack(ys, dim=0)
 
         smiles, uniprot1, uniprot2, ppi_id = zip(*metas)
-        return stacked_inputs, y, (smiles, uniprot1, uniprot2)
+        return stacked_inputs, y, (smiles, uniprot1, uniprot2, ppi_id)
 
 class MoleculeDataset(Dataset):
     """

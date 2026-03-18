@@ -19,25 +19,32 @@ warnings.filterwarnings("ignore")
 import logging
 logger = logging.getLogger(__name__)
 
+from utils.parser import get_args
 from evaluate.train_test_cold_start_ppi import train_test_cold_start_ppi
 from evaluate.cold_neg_smoo_eval import cold_neg_smoo_eval
+from evaluate.cv_cold_eval import cv_cold_eval
 from evaluate.mcd_eval import mcd_eval
 
 PPI_DICT_PATH = 'saved_obj/ppi_dict.pkl'
 PPI_DFS_DICT_PATH = "saved_obj/enamine_ppi_dfs_dict.pkl"
 
-def cold_neg_smoo_eval_(
-    res_file_name = "cv_cold_neg_smoo_results",
-    neg_factor = "1",
-    smoo_factor= "1",
+def cv_cold_eval_(
+    res_file_name = "cv_cold_results",
+    save_probs=False,
+    use_struct= True,
+    strct_dataset='dataset1',
+    strct_strategy="conditional",
+    strct_aug_train=False,
+    strct_aug_eval=False,
+    job_id= "date@j1",
     n = 10,
     device = 'cuda'
-):
+) -> None:
     """
     Runs cv_cold_neg_smoo and appends one row to results/<res_file_name>.csv
 
     Output row schema (7 columns):
-      exp, val_res, fold1, fold2, fold3, fold4, fold5
+      job_id, val_res, fold1, fold2, fold3, fold4, fold5
 
     - val_res: JSON string representing validation results for all folds
                e.g. {"fold1":[...], "fold2":[...], ...} or {"fold1":(auc,aupr,...), ...}
@@ -45,9 +52,70 @@ def cold_neg_smoo_eval_(
     - foldK: JSON string representing list of n tuples (auc, aupr, precision, sensitivity, specificity)
     """
 
-    exp_name = f'dataset_neg_fct_{neg_factor}_smoo_fct_{smoo_factor}'
+    exp_name = job_id
     logger.info(f'--- Start Cold Start Experiments for Dataset -> {exp_name} ---')
-    res_dict, val_metrics_dict = cold_neg_smoo_eval(neg_factor=neg_factor, smoo_factor=smoo_factor, n=n, device=device)
+    logger.info(f'Job hyperparameters -> use_struct={use_struct} strct dataset={strct_dataset}, strct strategy={strct_strategy}, strct train aug={strct_aug_train}, strct eval aug={strct_aug_eval}')
+
+    res_dict, val_metrics_dict = cv_cold_eval(use_struct=use_struct, save_probs=save_probs, strct_dataset=strct_dataset,
+                                                    strct_strategy=strct_strategy, strct_aug_train=strct_aug_train,
+                                                    strct_aug_eval=strct_aug_eval,  n=n, job_id=job_id, device=device)
+
+
+    fold_keys = [f"fold{i}" for i in range(1, 6)]    
+    row = {"exp": exp_name, "val_res": json.dumps(val_metrics_dict or {}, default=list)}
+    for fk in fold_keys:
+        row[fk] = json.dumps(res_dict.get(fk, []))
+
+    summary_df = pd.DataFrame([row], columns=["exp", "val_res"] + fold_keys)
+
+    # save/append
+    res_path = os.path.join("results", "result_tables", "final_results")
+    os.makedirs(res_path, exist_ok=True)
+    summary_path = os.path.join(res_path, f"{res_file_name}.csv")
+
+    if os.path.exists(summary_path):
+        existing_df = pd.read_csv(summary_path)
+        updated_df = pd.concat([existing_df, summary_df], ignore_index=True)
+    else:
+        updated_df = summary_df
+
+    updated_df.to_csv(summary_path, index=False)
+    logger.info(f"Saved/updated summary to: {summary_path}")
+
+
+def cold_neg_smoo_eval_(
+    res_file_name = "cv_cold_neg_smoo_results",
+    save_probs=False,
+    use_struct=True,
+    neg_factor = "1",
+    smoo_factor= "1",
+    strct_dataset='dataset1',
+    strct_strategy="conditional",
+    strct_aug_train=False,
+    strct_aug_eval=False,
+    job_id= "date@j1",
+    n = 10,
+    device = 'cuda'
+) -> None:
+    """
+    Runs cv_cold_neg_smoo and appends one row to results/<res_file_name>.csv
+
+    Output row schema (7 columns):
+      job_id, val_res, fold1, fold2, fold3, fold4, fold5
+
+    - val_res: JSON string representing validation results for all folds
+               e.g. {"fold1":[...], "fold2":[...], ...} or {"fold1":(auc,aupr,...), ...}
+               depending on what hv_scaffold_to_get_n_epochs returns.
+    - foldK: JSON string representing list of n tuples (auc, aupr, precision, sensitivity, specificity)
+    """
+
+    exp_name = f'dataset_neg_fct_{neg_factor}_smoo_fct_{smoo_factor}_{job_id}'
+    logger.info(f'--- Start Cold Start Experiments for Dataset -> {exp_name} ---')
+    logger.info(f'Job hyperparameters -> strct dataset={strct_dataset}, strct strategy={strct_strategy}, strct train aug={strct_aug_train}, strct eval aug={strct_aug_eval}')
+
+    res_dict, val_metrics_dict = cold_neg_smoo_eval(use_struct=use_struct, save_probs=save_probs, neg_factor=neg_factor, smoo_factor=smoo_factor, strct_dataset=strct_dataset,
+                                                    strct_strategy=strct_strategy, strct_aug_train=strct_aug_train,
+                                                    strct_aug_eval=strct_aug_eval,  n=n, job_id=job_id, device=device)
 
 
     fold_keys = [f"fold{i}" for i in range(1, 6)]    
@@ -63,7 +131,7 @@ def cold_neg_smoo_eval_(
     summary_df = pd.DataFrame([row], columns=["exp", "val_res"] + fold_keys)
 
     # save/append
-    res_path = os.path.join("results", "result_tables")
+    res_path = os.path.join("results", "result_tables", "final_results")
     os.makedirs(res_path, exist_ok=True)
     summary_path = os.path.join(res_path, f"{res_file_name}.csv")
 
@@ -75,8 +143,6 @@ def cold_neg_smoo_eval_(
 
     updated_df.to_csv(summary_path, index=False)
     logger.info(f"Saved/updated summary to: {summary_path}")
-
-    return res_dict, val_metrics_dict
 
 
 def mcd_eval_(exp_name='Enamine', smiles_column='smiles'):
@@ -107,33 +173,28 @@ def mcd_eval_(exp_name='Enamine', smiles_column='smiles'):
 
 def main():
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--log_msg", type=str, default='log message', help="First message to display in the log file; for experiment description")
-    parser.add_argument("--res_file_name", type=str, default='res', help="name of the result; pandas.DataFrame() object")
-    parser.add_argument("--eval_method", type=str, default='cv_neg_smoo', choices=['cv','cv_neg_smoo', 'cold', "mcd"], help="path to the smiles file")
-    parser.add_argument("--cv_method", type=str, default='all', choices=['all', 'per_fam'], help="The split for 10-fold cross-validation - all data or per RNA subtype ")
-    parser.add_argument('--neg_factor', type=str, default='5', choices=['1', '2', '3', '4', '5'], help="negative sampling hyperparameter (e.g., 1, 2 ... 5)")
-    parser.add_argument('--smoo_factor', type=str, default='1.0', choices=['0.75', '0.8', '0.9', '0.95', '1.0'], help="")
-    parser.add_argument('--n_exp', type=int, default=10, help="number of experiments for statistically significant evaluation")
-    parser.add_argument('--epo_f1', type=int, default=50, help="number of epochs to train fold 1 (cold eval)")
-    parser.add_argument('--epo_f2', type=int, default=50, help="number of epochs to train fold 2 (cold eval)")
-    parser.add_argument('--epo_f3', type=int, default=50, help="number of epochs to train fold 3 (cold eval)")
-    parser.add_argument('--epo_f4', type=int, default=50, help="number of epochs to train fold 4 (cold eval)")
-    parser.add_argument('--epo_f5', type=int, default=50, help="number of epochs to train fold 5 (cold eval)")
-    parser.add_argument('--n_epochs', type=int, nargs=5, default=[50, 50, 50, 50, 50], help="List of 5 epoch values for cold eval")
-    parser.add_argument('--folds', type=int, nargs='+', default=[1, 2, 3, 4, 5], help="List of folds for cold eval (1-5)")
-    parser.add_argument("--log_file_name", type=str, default="res", help="name of the logger file (e.g., result.log)")
-    parser.add_argument("--device", type=str, default='cuda', choices=['cuda', 'cpu'], help="device to use - cuda/cpu")
-    args = parser.parse_args()
-
+    # get all arguments
+    args = get_args()
 
     log_msg = args.log_msg
     res_file_name = args.res_file_name
     log_file_name = args.log_file_name
-    eval_method= args.eval_method
-    neg_factor = args.neg_factor
-    smoo_factor = args.smoo_factor
+    eval_method = args.eval_method
+    exp_log_dir = args.exp_log_dir
+    job_id = args.job_id
     n_exp = args.n_exp
+    
+    use_struct = True if args.use_struct == "True" else False
+    save_probs = True if args.save_probs == "True" else False # whether to save model probs for val & test
+
+    # cold evaluation @ negative sampling & smoothing factor unique hyperparameters
+    neg_factor = args.neg_factor # ["1", "2", "3", "4", "5"]
+    smoo_factor = args.smoo_factor # ["0.75", "0.8", "0.9", "0.95", "1.0"]
+    strct_dataset = args.strct_dataset # ["dataset1", "dataset2", "dataset3"]
+    strct_strategy = args.strct_strategy # ["conditional", "full_mean", "subset_mean"]
+    strct_aug_train = True if args.strct_aug_train == "True" else False
+    strct_aug_eval = False if args.strct_aug_eval == "False" else True
+
     epo_f1 = args.epo_f1
     epo_f2 = args.epo_f2
     epo_f3 = args.epo_f3
@@ -141,12 +202,13 @@ def main():
     epo_f5 = args.epo_f5
     n_epochs = args.n_epochs
     folds = args.folds
+
     device = args.device
 
-    logger.info(log_msg)
 
+    logger.info(log_msg)
     # constract log file in order to log the results
-    log_dir = os.path.join("results", "logs")
+    log_dir = os.path.join("results", "logs", exp_log_dir)
     os.makedirs(log_dir, exist_ok=True)
     log_path = os.path.join(log_dir, f"{log_file_name}.log")
     logging.basicConfig(filename=log_path, level=logging.INFO,
@@ -157,7 +219,12 @@ def main():
         nel = [epo_f1, epo_f2, epo_f3, epo_f4, epo_f5]
         train_test_cold_start_ppi(nel=nel, n=n_exp)
     elif eval_method =='cv_neg_smoo':
-        cold_neg_smoo_eval_(neg_factor=neg_factor, smoo_factor=smoo_factor, res_file_name=res_file_name, n=n_exp, device=device)
+        cold_neg_smoo_eval_(res_file_name=res_file_name, save_probs=save_probs, use_struct=use_struct, neg_factor=neg_factor, smoo_factor=smoo_factor,
+                            strct_dataset=strct_dataset, strct_strategy=strct_strategy, strct_aug_train=strct_aug_train,
+                             strct_aug_eval=strct_aug_eval, job_id=job_id , n=n_exp, device=device)
+    elif eval_method == 'cv_cold':
+        cv_cold_eval_(res_file_name=res_file_name, save_probs=save_probs, use_struct=use_struct, strct_dataset=strct_dataset, strct_strategy=strct_strategy,
+                      strct_aug_train=strct_aug_train, strct_aug_eval=strct_aug_eval, job_id=job_id, n=n_exp, device=device)
     elif eval_method == 'mcd':
         pass # TODO: finish building mcd pipeline & test it
 

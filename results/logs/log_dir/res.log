@@ -1,0 +1,141 @@
+2026-03-18 15:16:28,405 - --- Start Cold Start Experiments for Dataset -> date@j1 ---
+2026-03-18 15:16:28,405 - Job hyperparameters -> use_struct=False strct dataset=dataset1, strct strategy=conditional, strct train aug=False, strct eval aug=False
+2026-03-18 15:16:48,434 - --- Start Cold Start Experiments for Dataset -> date@j1 ---
+2026-03-18 15:16:48,434 - Job hyperparameters -> use_struct=False strct dataset=dataset1, strct strategy=conditional, strct train aug=False, strct eval aug=False
+2026-03-18 15:16:48,434 - ---- Start Training & Testing Fold 1 ----
+2026-03-18 15:16:48,435 - experiment 1 ...
+2026-03-18 15:16:48,437 - --- Executing CV with scaffold split with hyperparameters: use_struct=False, save_probs=True, seed=42 ...
+2026-03-18 15:16:48,539 - MFusionPPI model with self, with mlps after flatten @ w/o structure features
+2026-03-18 15:17:26,776 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug train=False, aug eval=False
+2026-03-18 15:17:48,973 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug train=False, aug eval=False
+2026-03-18 15:17:58,789 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug train=False, aug eval=False
+2026-03-18 15:18:11,155 - ---- train loader size -> 62495, val loader size 3290 ----
+2026-03-18 15:18:41,527 - NEW BEST @ epoch 1: train_auc=0.6864, val_auc=0.8023, val_aupr=0.5841, val_precision=0.3286, val_sensitivity=0.7768; val_specificity=0.6488
+2026-03-18 15:21:02,211 - --- Start Cold Start Experiments for Dataset -> date@j1 ---
+2026-03-18 15:21:02,211 - Job hyperparameters -> use_struct=False strct dataset=dataset1, strct strategy=conditional, strct train aug=False, strct eval aug=False
+2026-03-18 15:21:02,211 - ---- Start Training & Testing Fold 1 ----
+2026-03-18 15:21:02,213 - experiment 1 ...
+2026-03-18 15:21:02,215 - --- Executing CV with scaffold split with hyperparameters: use_struct=False, save_probs=True, seed=42 ...
+2026-03-18 15:21:02,319 - MFusionPPI model with self, with mlps after flatten @ w/o structure features
+2026-03-18 15:21:39,679 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug train=False, aug eval=False
+2026-03-18 15:21:59,829 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug train=False, aug eval=False
+2026-03-18 15:22:07,374 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug train=False, aug eval=False
+2026-03-18 15:22:14,993 - ---- train loader size -> 62495, val loader size 3290 ----
+2026-03-18 15:22:44,477 - NEW BEST @ epoch 1: train_auc=0.6864, val_auc=0.8023, val_aupr=0.5841, val_precision=0.3286, val_sensitivity=0.7768; val_specificity=0.6488
+2026-03-18 15:23:13,590 - NEW BEST @ epoch 2: train_auc=0.8414, val_auc=0.8797, val_aupr=0.6945, val_precision=0.4214, val_sensitivity=0.8188; val_specificity=0.7513
+2026-03-18 15:23:15,007 - Saved validation probabilities to -> results/result_tables/date/j1/1/exp_1/val_exp_1.csv successfully
+2026-03-18 15:23:15,674 - --- Saved train vs. val AUC curves to results/plots/date/j1/fold_1.png successfullys
+2026-03-18 15:23:15,765 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug train=False, aug eval=False
+2026-03-18 15:23:58,869 - Saved test probabilities to -> results/result_tables/date/j1/1/exp_1/test_exp_1.csv successfully
+2026-03-18 15:23:58,869 - Test Loss: 0.4491
+2026-03-18 15:23:58,869 - Test AUC: 0.9398
+2026-03-18 15:23:58,870 - Test AUPR: 0.8313
+2026-03-18 15:23:58,870 - Test Precision: 0.4897
+2026-03-18 15:23:58,871 - Test Sensitivity (Recall): 0.8902
+2026-03-18 15:23:58,871 - Test Specificity: 0.8092
+2026-03-18 15:23:58,890 - experiment 2 ...
+2026-03-18 15:23:58,892 - --- Executing CV with scaffold split with hyperparameters: use_struct=False, save_probs=True, seed=42 ...
+2026-03-18 15:23:58,991 - MFusionPPI model with self, with mlps after flatten @ w/o structure features
+2026-03-18 15:24:35,485 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug train=False, aug eval=False
+2026-03-18 15:24:48,801 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug train=False, aug eval=False
+2026-03-18 15:25:43,342 - --- Start Cold Start Experiments for Dataset -> date@j1 ---
+2026-03-18 15:25:43,342 - Job hyperparameters -> use_struct=True strct dataset=dataset1, strct strategy=conditional, strct train aug=True, strct eval aug=True
+2026-03-18 15:25:43,342 - ---- Start Training & Testing Fold 1 ----
+2026-03-18 15:25:43,342 - experiment 1 ...
+2026-03-18 15:25:43,345 - --- Executing CV with scaffold split with hyperparameters: use_struct=True, save_probs=True, seed=42 ...
+2026-03-18 15:25:43,425 - MultiPPIMI model with self, with mlps after flatten & Structure Features (old)
+2026-03-18 15:26:22,951 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug train=True, aug eval=False
+2026-03-18 15:26:37,425 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug train=False, aug eval=False
+2026-03-18 15:26:45,252 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug train=False, aug eval=True
+2026-03-18 15:38:39,929 - --- Start Cold Start Experiments for Dataset -> date@j1 ---
+2026-03-18 15:38:39,929 - Job hyperparameters -> use_struct=True strct dataset=dataset1, strct strategy=conditional, strct train aug=True, strct eval aug=True
+2026-03-18 15:38:39,930 - ---- Start Training & Testing Fold 1 ----
+2026-03-18 15:38:39,930 - experiment 1 ...
+2026-03-18 15:38:39,933 - --- Executing CV with scaffold split with hyperparameters: use_struct=True, save_probs=True, seed=42 ...
+2026-03-18 15:38:40,017 - MultiPPIMI model with self, with mlps after flatten & Structure Features (old)
+2026-03-18 15:39:17,468 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug train=True, aug eval=False
+2026-03-18 15:39:35,635 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug train=False, aug eval=False
+2026-03-18 15:39:43,222 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug train=False, aug eval=True
+2026-03-18 15:39:50,801 - ---- train loader size -> 62495, val loader size 3290 ----
+2026-03-18 16:08:13,916 - --- Start Cold Start Experiments for Dataset -> dataset_neg_fct_5_smoo_fct_1.0_date@j1 ---
+2026-03-18 16:08:13,916 - Job hyperparameters -> strct dataset=dataset1, strct strategy=conditional, strct train aug=True, strct eval aug=True
+2026-03-18 16:08:13,916 - ---- Start Training & Testing Fold 1 ----
+2026-03-18 16:08:13,917 - experiment 1 ...
+2026-03-18 16:08:13,920 - --- Executing CV with scaffold split with hyperparameters of neg_factor=5 & smoo_factor=1.0 (seed=42) ...
+2026-03-18 16:08:14,017 - MultiPPIMI model with self, with mlps after flatten & Structure Features (old)
+2026-03-18 16:08:51,697 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug train=True, aug eval=False
+2026-03-18 16:09:05,229 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug train=False, aug eval=False
+2026-03-18 16:09:12,897 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug train=False, aug eval=True
+2026-03-18 16:09:20,606 - ---- train loader size -> 62858, val loader size 3309 ----
+2026-03-18 16:10:18,504 - NEW BEST @ epoch 1: train_auc=0.6885, val_auc=0.8372, val_aupr=0.6012, val_precision=0.3670, val_sensitivity=0.7487; val_specificity=0.7273
+2026-03-18 16:11:16,997 - NEW BEST @ epoch 2: train_auc=0.8641, val_auc=0.9163, val_aupr=0.7372, val_precision=0.5205, val_sensitivity=0.7938; val_specificity=0.8455
+2026-03-18 16:12:15,641 - NEW BEST @ epoch 3: train_auc=0.9160, val_auc=0.9372, val_aupr=0.7843, val_precision=0.5935, val_sensitivity=0.7972; val_specificity=0.8847
+2026-03-18 16:13:13,771 - NEW BEST @ epoch 4: train_auc=0.9425, val_auc=0.9481, val_aupr=0.8160, val_precision=0.6469, val_sensitivity=0.7938; val_specificity=0.9085
+2026-03-18 16:14:11,341 - NEW BEST @ epoch 5: train_auc=0.9569, val_auc=0.9584, val_aupr=0.8479, val_precision=0.7383, val_sensitivity=0.7678; val_specificity=0.9425
+2026-03-18 16:15:08,775 - NEW BEST @ epoch 6: train_auc=0.9677, val_auc=0.9645, val_aupr=0.8698, val_precision=0.7772, val_sensitivity=0.7799; val_specificity=0.9528
+2026-03-18 16:16:06,863 - NEW BEST @ epoch 7: train_auc=0.9739, val_auc=0.9695, val_aupr=0.8853, val_precision=0.7804, val_sensitivity=0.8007; val_specificity=0.9524
+2026-03-18 16:16:41,732 - --- Start Cold Start Experiments for Dataset -> dataset_neg_fct_5_smoo_fct_1.0_date@j1 ---
+2026-03-18 16:16:41,732 - Job hyperparameters -> strct dataset=dataset1, strct strategy=conditional, strct train aug=True, strct eval aug=True
+2026-03-18 16:16:41,732 - ---- Start Training & Testing Fold 1 ----
+2026-03-18 16:16:41,733 - experiment 1 ...
+2026-03-18 16:16:41,735 - --- Executing CV with scaffold split with hyperparameters of neg_factor=5 & smoo_factor=1.0 (seed=42) ...
+2026-03-18 16:16:41,792 - MultiPPIMI model with self, with mlps after flatten & Structure Features (old)
+2026-03-18 16:17:22,359 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug train=True, aug eval=False
+2026-03-18 16:17:39,015 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug train=False, aug eval=False
+2026-03-18 16:17:47,651 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug train=False, aug eval=True
+2026-03-18 16:17:59,631 - ---- train loader size -> 62858, val loader size 3309 ----
+2026-03-18 16:18:57,782 - NEW BEST @ epoch 1: train_auc=0.6885, val_auc=0.8372, val_aupr=0.6012, val_precision=0.3670, val_sensitivity=0.7487; val_specificity=0.7273
+2026-03-18 16:19:55,979 - NEW BEST @ epoch 2: train_auc=0.8641, val_auc=0.9163, val_aupr=0.7372, val_precision=0.5205, val_sensitivity=0.7938; val_specificity=0.8455
+2026-03-18 16:20:15,364 - Saved validation probabilities to -> results/result_tables/date/j1/cold_neg_5_smoo_1.0/1/exp_1/val_exp_1.csv successfully
+2026-03-18 16:20:15,985 - --- Saved train vs. val AUC curves to results/plots/date/j1/neg_fct_5_smoo_fct_1.0/neg_fct_5_smoo_fct_1.0_fold_1.png successfullys
+2026-03-18 16:20:15,998 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug train=False, aug eval=True
+2026-03-18 16:20:49,869 - Saved test probabilities to -> results/result_tables/date/j1/cold_neg_5_smoo_1.0/1/exp_1/test_exp_1.csv successfully
+2026-03-18 16:20:49,869 - Test Loss: 0.7914
+2026-03-18 16:20:49,870 - Test AUC: 0.4287
+2026-03-18 16:20:49,870 - Test AUPR: 0.4667
+2026-03-18 16:20:49,870 - Test Precision: 0.5137
+2026-03-18 16:20:49,871 - Test Sensitivity (Recall): 0.1815
+2026-03-18 16:20:49,872 - Test Specificity: 0.8282
+2026-03-18 16:20:49,887 - experiment 2 ...
+2026-03-18 16:20:49,889 - --- Executing CV with scaffold split with hyperparameters of neg_factor=5 & smoo_factor=1.0 (seed=42) ...
+2026-03-18 16:20:49,978 - MultiPPIMI model with self, with mlps after flatten & Structure Features (old)
+2026-03-18 16:21:28,608 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug train=True, aug eval=False
+2026-03-18 16:21:41,956 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug train=False, aug eval=False
+2026-03-18 16:21:50,006 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug train=False, aug eval=True
+2026-03-18 16:21:57,745 - ---- train loader size -> 62858, val loader size 3309 ----
+2026-03-18 16:22:55,557 - NEW BEST @ epoch 1: train_auc=0.6812, val_auc=0.8306, val_aupr=0.6010, val_precision=0.3553, val_sensitivity=0.7556; val_specificity=0.7105
+2026-03-18 16:23:53,899 - NEW BEST @ epoch 2: train_auc=0.8494, val_auc=0.9020, val_aupr=0.7118, val_precision=0.4940, val_sensitivity=0.7799; val_specificity=0.8313
+2026-03-18 16:24:13,273 - Saved validation probabilities to -> results/result_tables/date/j1/cold_neg_5_smoo_1.0/1/exp_2/val_exp_2.csv successfully
+2026-03-18 16:24:13,772 - --- Saved train vs. val AUC curves to results/plots/date/j1/neg_fct_5_smoo_fct_1.0/neg_fct_5_smoo_fct_1.0_fold_1.png successfullys
+2026-03-18 16:24:13,783 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug train=False, aug eval=True
+2026-03-18 16:24:42,636 - Saved test probabilities to -> results/result_tables/date/j1/cold_neg_5_smoo_1.0/1/exp_2/test_exp_2.csv successfully
+2026-03-18 16:24:42,636 - Test Loss: 0.7701
+2026-03-18 16:24:42,636 - Test AUC: 0.4442
+2026-03-18 16:24:42,637 - Test AUPR: 0.4582
+2026-03-18 16:24:42,637 - Test Precision: 0.4550
+2026-03-18 16:24:42,637 - Test Sensitivity (Recall): 0.1470
+2026-03-18 16:24:42,638 - Test Specificity: 0.8239
+2026-03-18 16:24:42,664 - experiment 3 ...
+2026-03-18 16:24:42,666 - --- Executing CV with scaffold split with hyperparameters of neg_factor=5 & smoo_factor=1.0 (seed=42) ...
+2026-03-18 16:24:42,714 - MultiPPIMI model with self, with mlps after flatten & Structure Features (old)
+2026-03-18 16:26:37,501 - --- Start Cold Start Experiments for Dataset -> dataset_neg_fct_5_smoo_fct_1.0_date@j1 ---
+2026-03-18 16:26:37,502 - Job hyperparameters -> strct dataset=dataset1, strct strategy=conditional, strct train aug=True, strct eval aug=True
+2026-03-18 16:26:37,502 - ---- Start Training & Testing Fold 1 ----
+2026-03-18 16:26:37,503 - experiment 1 ...
+2026-03-18 16:26:37,505 - --- Executing CV with scaffold split with hyperparameters of neg_factor=5 & smoo_factor=1.0 (seed=42) ...
+2026-03-18 16:26:37,559 - MFusionPPI model with self, with mlps after flatten @ w/o structure features
+2026-03-18 16:27:15,295 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug train=True, aug eval=False
+2026-03-18 16:27:29,128 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug train=False, aug eval=False
+2026-03-18 16:27:36,940 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug train=False, aug eval=True
+2026-03-18 16:27:44,750 - ---- train loader size -> 62858, val loader size 3309 ----
+2026-03-18 16:28:35,767 - --- Start Cold Start Experiments for Dataset -> dataset_neg_fct_5_smoo_fct_1.0_date@j1 ---
+2026-03-18 16:28:35,767 - Job hyperparameters -> strct dataset=dataset1, strct strategy=conditional, strct train aug=True, strct eval aug=True
+2026-03-18 16:28:35,767 - ---- Start Training & Testing Fold 1 ----
+2026-03-18 16:28:35,768 - experiment 1 ...
+2026-03-18 16:28:35,770 - --- Executing CV with scaffold split with hyperparameters of neg_factor=5 & smoo_factor=1.0 (seed=42) ...
+2026-03-18 16:28:35,826 - MFusionPPI model with self, with mlps after flatten @ w/o structure features
+2026-03-18 16:29:13,492 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug train=True, aug eval=False
+2026-03-18 16:29:27,231 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug train=False, aug eval=False
+2026-03-18 16:29:35,015 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug train=False, aug eval=True
+2026-03-18 16:29:42,720 - ---- train loader size -> 62858, val loader size 3309 ----
+2026-03-18 16:30:38,722 - NEW BEST @ epoch 1: train_auc=0.5110, val_auc=0.5133, val_aupr=0.1946, val_precision=0.1884, val_sensitivity=0.2634; val_specificity=0.7602
