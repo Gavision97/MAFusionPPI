@@ -28,6 +28,9 @@ from evaluate.mcd_eval import mcd_eval
 PPI_DICT_PATH = 'saved_obj/ppi_dict.pkl'
 PPI_DFS_DICT_PATH = "saved_obj/enamine_ppi_dfs_dict.pkl"
 
+DATA_PATH = 'datasets/cold_both_folds'
+#DATA_PATH = 'datasets/multi_ppimi_cold_both'
+#DATA_PATH = 'datasets/multi_ppimi_s4_tests_splits_with_my_train'
 def cv_cold_eval_(
     res_file_name = "cv_cold_results",
     save_probs=False,
@@ -53,8 +56,10 @@ def cv_cold_eval_(
     """
 
     exp_name = job_id
-    logger.info(f'--- Start Cold Start Experiments for Dataset -> {exp_name} ---')
-    logger.info(f'Job hyperparameters -> use_struct={use_struct} strct dataset={strct_dataset}, strct strategy={strct_strategy}, strct train aug={strct_aug_train}, strct eval aug={strct_aug_eval}')
+    logger.info(f'--- Start Cold Start Experiments for Dataset -> {DATA_PATH} ---')
+
+    if use_struct:
+        logger.info(f'Job hyperparameters -> use_struct={use_struct} strct dataset={strct_dataset}, strct strategy={strct_strategy}, strct train aug={strct_aug_train}, strct eval aug={strct_aug_eval}')
 
     res_dict, val_metrics_dict = cv_cold_eval(use_struct=use_struct, save_probs=save_probs, strct_dataset=strct_dataset,
                                                     strct_strategy=strct_strategy, strct_aug_train=strct_aug_train,

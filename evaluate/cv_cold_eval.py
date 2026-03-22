@@ -13,8 +13,10 @@ from MAFusionPPI.MAFusionPPI import MAFusionPPI, MFusionPPI
 from utils.tools import plot_train_val_auc, set_seed, preprocess_dataset
 
 #DATA_PATH = 'datasets/splits_with_ppimi_test_folds_s3_corrected_'
-DATA_PATH = 'datasets/train_test_5_0.75'
-#DATA_PATH = 'datasets/cold_both_folds'
+#DATA_PATH = 'datasets/train_test_5_0.75'
+DATA_PATH = 'datasets/cold_both_folds' # j1
+#DATA_PATH = 'datasets/multi_ppimi_cold_both' # j2
+#DATA_PATH = 'datasets/multi_ppimi_s4_tests_splits_with_my_train' # j3
 UNIPROT_MAPPING_PATH = 'datasets/idmapping_unip.tsv'
 
 # best hyperparameters; extracted from ablation study & vast hyperparameter search
@@ -40,7 +42,7 @@ else:
 def hv_scaffold(use_struct=True, save_probs=False, strct_dataset='dataset1', strct_strategy='conditional', strct_aug_train=False,
                         strct_aug_eval=False, fold=1, exp=1, job_id='date@j1', device='cuda', seed=42):
     logger.info(f'--- Executing CV with scaffold split with hyperparameters: use_struct={use_struct}, save_probs={save_probs}, seed={seed} ...')
-
+    logger.info(f'Dataset path -> {DATA_PATH}')
     train_fp = glob.glob(os.path.join(DATA_PATH, f"train_fold{fold}_*.csv"))[0] # catch files like 'trian_fold2_5_0.9.csv'
     train_df = pd.read_csv(train_fp)
 
@@ -111,7 +113,7 @@ def cv_cold_eval(use_struct=True, save_probs=False, strct_dataset='dataset1',str
             val_res_dict[f'fold{i}'].append(curr_exp_val_metric_tuple)
 
 
-            test_fp = glob.glob(os.path.join(DATA_PATH, f"train_fold{i}_*.csv"))[0] # catch files like 'trian_fold2_5_0.9.csv'
+            test_fp = glob.glob(os.path.join(DATA_PATH, f"test_fold{i}_*.csv"))[0] # catch files like 'trian_fold2_5_0.9.csv'
             #test_df  = preprocess_dataset(test_fp)
             test_df = pd.read_csv(test_fp)
 
