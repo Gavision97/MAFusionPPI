@@ -174,3 +174,18 @@ class FeatureReducer(nn.Module):
         x = self.pool(x) 
         x = x.transpose(1, 2)  # Change shape back to [batch_size, target_length, out_channels]
         return x
+    
+
+##################################################################################################
+#### Gated feature fusion which adapted from BioLMMNet by Abit et al. #### 
+#### Github - https://github.com/abrarrahmanabir/BioLLMNet/blob/main/rna_molecule.ipynb ####
+class GatedFeatureFusion(nn.Module):
+    """Gates to control the contribution of each path"""
+    def __init__(self, input_dim):
+        super().__init__()
+        self.gate = nn.Parameter(torch.rand(input_dim))
+
+    def forward(self, x1, x2):
+        # print(x1.shape, x2.shape)
+        gate_values = torch.sigmoid(self.gate)
+        return x1 * gate_values + x2 * (1 - gate_values)

@@ -80,6 +80,7 @@ class ABSMAFusionPPI(ABC, nn.Module):
                     batch_size=32, device='cuda', num_workers=5, seed=42):
         
         train_dataset = TrainMoleculeDataset(ds_=dataset, struct_dataset=strct_dataset, strategy=strct_strategy, aug_train=strct_aug_train)
+        val_dataset_es = EvalMoleculeDataset(ds_=val_subset, use_struct=use_struct, struct_dataset=strct_dataset, strategy=strct_strategy, eval_all_confs=False) 
 
         # drop_last=True in order to avoid bug when batch_size=1 in training phase (BatchNorn1d crashes when batch_size=1)
         g = torch.Generator()

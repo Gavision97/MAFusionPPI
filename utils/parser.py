@@ -55,7 +55,7 @@ def get_args():
     parser.add_argument(
         "--use_struct",
         type=str,
-        default="False",
+        default="True",
         choices=["True", "False"],
         help="whether to use structure features or not"
     )
@@ -162,6 +162,112 @@ def get_args():
         default="cuda",
         choices=["cuda", "cpu"],
         help="device to use - cuda/cpu"
+    )
+
+    # ---- Model architecture arguments ----
+    parser.add_argument(
+        "--exclude_modalities",
+        nargs="+",
+        default=None,
+        choices=["esm", "fegs", "gae"],
+        help="Sequence modalities to exclude"
+    )
+
+    parser.add_argument(
+        "--mlp_dropout",
+        nargs="+",
+        type=float,
+        default=[0.3],
+        help="Dropout used in modality MLPs"
+    )
+
+    parser.add_argument(
+        "--head_dropout",
+        nargs="+",
+        type=float,
+        default=[0.3],
+        help="Dropout used in prediction head"
+    )
+
+    parser.add_argument(
+        "--self_attn_dropout",
+        nargs="+",
+        type=float,
+        default=[0.1],
+        help="Dropout used in self-attention layers"
+    )
+
+    parser.add_argument(
+        "--join_attn_feat",
+        type=str,
+        default="both",
+        choices=["both", "ppiformer", "omega"],
+        help="Structure features used in joint attention"
+    )
+
+    parser.add_argument(
+        "--compound_dim",
+        type=int,
+        default=850,
+        help="Input dimension of structure embeddings"
+    )
+
+    parser.add_argument(
+        "--compound_proj_dim",
+        nargs="+",
+        type=int,
+        default=[256],
+        help="Projected dimension used in joint attention"
+    )
+
+    parser.add_argument(
+        "--ppi_fuse_setting",
+        nargs="+",
+        type=str,
+        default=["cat"],
+        choices=["cat", "gate", "self_attn"],
+        help="PPI fusion mechanism"
+    )
+
+    parser.add_argument(
+        "--head_fuse",
+        nargs="+",
+        type=str,
+        default=["cat"],
+        choices=["cat", "gate"],
+        help="Final head fusion method"
+    )
+
+    parser.add_argument(
+        "--proj_feat",
+        nargs="+",
+        type=str,
+        default=["False"],
+        choices=["True", "False"],
+        help="Use lightweight projection layers instead of full MLP encoders"
+    )
+
+    parser.add_argument(
+        "--lr",
+        nargs="+",
+        type=float,
+        default=[1e-5],
+        help="Learning rate"
+    )
+
+    parser.add_argument(
+        "--weight_decay",
+        nargs="+",
+        type=float,
+        default=[1e-3],
+        help="Weight decay for optimizer"
+    )
+
+    parser.add_argument(
+        "--batch_size",
+        type=int,
+        default=64,
+        help="Training batch size"
     )
 
     return parser.parse_args()

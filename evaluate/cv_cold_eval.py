@@ -10,6 +10,7 @@ import torch.optim as optim
 
 
 from MAFusionPPI.MAFusionPPI import MAFusionPPI, MFusionPPI
+from MAFusionPPI.MAStructFusionPPI import choose_model_setting
 from utils.tools import plot_train_val_auc, set_seed, preprocess_dataset
 
 #DATA_PATH = 'datasets/splits_with_ppimi_test_folds_s3_corrected_'
@@ -39,7 +40,7 @@ else:
     device = "cpu"
 
 
-def hv_scaffold(use_struct=True, save_probs=False, strct_dataset='dataset1', strct_strategy='conditional', strct_aug_train=False,
+def hv_scaffold(model_kwargs=None, use_struct=True,save_probs=False, strct_dataset='dataset1', strct_strategy='conditional', strct_aug_train=False,
                         strct_aug_eval=False, fold=1, exp=1, job_id='date@j1', device='cuda', seed=42):
     logger.info(f'--- Executing CV with scaffold split with hyperparameters: use_struct={use_struct}, save_probs={save_probs}, seed={seed} ...')
     logger.info(f'Dataset path -> {DATA_PATH}')
@@ -48,12 +49,12 @@ def hv_scaffold(use_struct=True, save_probs=False, strct_dataset='dataset1', str
 
     # initialize model w or w/o strucure features
     if use_struct:
-        model = MAFusionPPI().to(device=device)
+        model = choose_model_setting(**model_kwargs).to(device=device)
     else:
         train_df = preprocess_dataset(pd.read_csv(train_fp)) # drop 'ppi_id' column & duplicates
         model = MFusionPPI().to(device=device)
 
-    best_model, best_val_metrics_dict, train_aucs, val_aucs = model.heldout_val_model(f"{job_id}_{fold}_{exp}", use_struct=use_struct, num_epochs=MAX_N_EPOCHS, dataset=train_df,
+    best_model, best_val_metrics_dict, train_aucs, val_aucs = model.heldout_val_model(f"{job_id}_{fold}_{exp}", model_kwargs=model_kwargs, use_struct=use_struct, num_epochs=MAX_N_EPOCHS, dataset=train_df,
                                                                                       strct_dataset=strct_dataset, strct_strategy=strct_strategy, strct_aug_train=strct_aug_train, 
                                                                                       strct_aug_eval=strct_aug_eval, optimizer=optim.AdamW(model.parameters(), lr=LR, weight_decay=WEIGHT_DECAY),
                                                                                       criterion=nn.BCEWithLogitsLoss(), is_neg_smoo=False, save_probs=save_probs, batch_size=BATCH_SIZE, device=device, num_workers=NUM_WORKERS, seed=seed)
@@ -75,7 +76,7 @@ def hv_scaffold(use_struct=True, save_probs=False, strct_dataset='dataset1', str
 
 
 def cv_cold_eval(use_struct=True, save_probs=False, strct_dataset='dataset1',strct_strategy='conditional', strct_aug_train=False,
-                        strct_aug_eval=False, n=10, job_id='date@j1', device='cuda'):
+                        strct_aug_eval=False, n=10, job_id='date@j1', device='cuda', model_kwargs=None):
     '''
     Cold start setting evaluation for dataset with some negative sampling factor 
     and smoothing factor in order to select the best dataset
@@ -105,7 +106,7 @@ def cv_cold_eval(use_struct=True, save_probs=False, strct_dataset='dataset1',str
             logger.info(f"experiment {exp_num} ...")
             set_seed(seed=exp_num) 
             # heldout validation using scaffold splitter & early stopping on the validation set
-            best_model, val_metric_dict = hv_scaffold(use_struct=use_struct, save_probs=save_probs, strct_dataset=strct_dataset, strct_strategy=strct_strategy, strct_aug_train=strct_aug_train,
+            best_model, val_metric_dict = hv_scaffold(model_kwargs=model_kwargs, use_struct=use_struct, save_probs=save_probs, strct_dataset=strct_dataset, strct_strategy=strct_strategy, strct_aug_train=strct_aug_train,
                                                       strct_aug_eval=strct_aug_eval, fold=i, exp=exp_num, job_id=job_id, 
                                                       device=device, seed=SCAFFOLD_SPLIT_SEED)
             curr_exp_val_metric_tuple = (val_metric_dict['AUC'], val_metric_dict['AUPR'],
@@ -119,7 +120,7 @@ def cv_cold_eval(use_struct=True, save_probs=False, strct_dataset='dataset1',str
 
             # evaluate best model from heldout evaluation step on the cold test set & return
             # metrics (auc, aupr, etc ..); set save=True in order to save predicted probabilities in csv
-            test_metrics_dict, _ = best_model.test_model(fold=f"{job_id}_{i}_{exp_num}", use_struct=use_struct, dataset=test_df,
+            test_metrics_dict, _ = best_model.test_model(fold=f"{job_id}_{i}_{exp_num}", model_kwargs=model_kwargs, use_struct=use_struct, dataset=test_df,
                                                          strct_dataset=strct_dataset, strct_strategy=strct_strategy, eval_all_confs=strct_aug_eval, criterion=nn.BCEWithLogitsLoss(),
                                                          is_neg_smoo=False, save_probs=save_probs, batch_size=BATCH_SIZE, device=device, num_workers=NUM_WORKERS)
             curr_exp_metric_tuple = (test_metrics_dict['AUC'], test_metrics_dict['AUPR'], test_metrics_dict['Precision'],

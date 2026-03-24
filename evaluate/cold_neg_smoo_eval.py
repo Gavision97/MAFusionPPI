@@ -8,7 +8,8 @@ import torch.nn as nn
 import torch.optim as optim
 
 
-from MAFusionPPI.MAFusionPPI_ import MFusionPPI
+#from MAFusionPPI.MAFusionPPI import MAFusionPPI, MFusionPPI
+from MAFusionPPI.MAStructFusionPPI import MAFusionPPI
 from utils.tools import plot_train_val_auc, set_seed
 
 DATA_PATH = 'datasets/splits_with_ppimi_test_folds_s3_corrected_'
@@ -54,10 +55,10 @@ def hv_scaffold(use_struct=True, save_probs=False, neg_factor='1', smoo_factor='
 
         # initialize model w or w/o strucure features
     if use_struct:
-        model = MFusionPPI().to(device=device)
+        model = MAFusionPPI().to(device=device)
     else:
         train_df = preprocess_dataset(pd.read_csv(train_fp)) # drop 'ppi_id' column & duplicates
-        model = MFusionPPI().to(device=device)
+        model = MAFusionPPI().to(device=device)
     best_model, best_val_metrics_dict, train_aucs, val_aucs = model.heldout_val_model(f"{job_id}_{fold}_{neg_factor}_{smoo_factor}_{exp}", use_struct=use_struct, num_epochs=MAX_N_EPOCHS, dataset=train_df,
                                                                                       strct_dataset=strct_dataset, strct_strategy=strct_strategy, strct_aug_train=strct_aug_train, 
                                                                                       strct_aug_eval=strct_aug_eval, optimizer=optim.AdamW(model.parameters(), lr=LR, weight_decay=WEIGHT_DECAY),
