@@ -27,7 +27,7 @@ WEIGHT_DECAY = 1e-3 # 0.001
 DROPOUT = 0.3
 BATCH_SIZE = 64
 NUM_WORKERS = 6 
-MAX_N_EPOCHS = 1 # max number of epochs for heldout evaluation with early stopping (default=500)
+MAX_N_EPOCHS = 1000 # max number of epochs for heldout evaluation with early stopping (default=500)
 
 # same scaffold splitter seed across all folds & experiments
 # (folds have different split, thus no need to use different seed across folds)
@@ -42,7 +42,7 @@ else:
 
 
 def hv_scaffold(model_kwargs=None, train_kwargs=None, use_struct=True,save_probs=False, strct_dataset='dataset1', strct_strategy='conditional', strct_aug_train=False,
-                        strct_aug_eval=False, fold=1, exp=1, job_id='date@j1', device='cuda', seed=42):
+                        strct_aug_eval=False, fold=1, exp=1, job_id='date@j1', device='cuda', seed=42, plot_train_vs_val=False):
     logger.info(f'--- Executing CV with scaffold split with hyperparameters: use_struct={use_struct}, save_probs={save_probs}, seed={seed} ...')
     logger.info(f'Dataset path -> {DATA_PATH}')
     train_fp = glob.glob(os.path.join(DATA_PATH, f"train_fold{fold}_*.csv"))[0] # catch files like 'trian_fold2_5_0.9.csv'
@@ -60,20 +60,20 @@ def hv_scaffold(model_kwargs=None, train_kwargs=None, use_struct=True,save_probs
                                                                                       strct_dataset=strct_dataset, strct_strategy=strct_strategy, strct_aug_train=strct_aug_train, 
                                                                                       strct_aug_eval=strct_aug_eval, optimizer=optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay),
                                                                                       criterion=nn.BCEWithLogitsLoss(), is_neg_smoo=False, save_probs=save_probs, batch_size=batch_size, device=device, num_workers=NUM_WORKERS, seed=seed)
-    
-    # plot train vs. validation AUC over epochs
-    date, job_id = job_id.split('@') # ['date', 'job_id'] e.g. [''1403', 'j4']
-    plots_dir = os.path.join("results", "plots", date, job_id)
-    os.makedirs(plots_dir, exist_ok=True)
-    plot_train_val_auc(
-            train_values=train_aucs,
-            val_values=val_aucs,
-            save_path=f"{plots_dir}/fold_{fold}.png",
-            title="Train vs. Val AUC Over Time",
-            xlabel="Training Steps (epochs)",
-            ylabel="AUC"
-    )
-    logger.info(f'--- Saved train vs. val AUC curves to {plots_dir}/fold_{fold}.png successfullys')
+    if plot_train_vs_val:
+        # plot train vs. validation AUC over epochs
+        date, job_id = job_id.split('@') # ['date', 'job_id'] e.g. [''1403', 'j4']
+        plots_dir = os.path.join("results", "plots", date, job_id)
+        os.makedirs(plots_dir, exist_ok=True)
+        plot_train_val_auc(
+                train_values=train_aucs,
+                val_values=val_aucs,
+                save_path=f"{plots_dir}/fold_{fold}.png",
+                title="Train vs. Val AUC Over Time",
+                xlabel="Training Steps (epochs)",
+                ylabel="AUC"
+        )
+        logger.info(f'--- Saved train vs. val AUC curves to {plots_dir}/fold_{fold}.png successfullys')
     return best_model, best_val_metrics_dict
 
 
