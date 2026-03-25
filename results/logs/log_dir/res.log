@@ -1,6 +1,14 @@
-2026-03-23 11:49:59,495 - --- Start Cold Start Experiments for Dataset -> dataset_neg_fct_5_smoo_fct_1.0_date@j1 ---
-2026-03-23 11:49:59,496 - Job hyperparameters -> strct dataset=dataset1, strct strategy=conditional, strct train aug=False, strct eval aug=False
-2026-03-23 11:49:59,496 - ---- Start Training & Testing Fold 1 ----
-2026-03-23 11:49:59,497 - experiment 1 ...
-2026-03-23 11:49:59,500 - --- Executing CV with scaffold split with hyperparameters of neg_factor=5 & smoo_factor=1.0 (seed=42) ...
-2026-03-23 11:49:59,589 - MultiPPIMI model with self, with mlps after flatten & Structure Features (old)
+2026-03-25 17:04:58,951 - Job date@j1 started with 1 hyperparameter combinations
+2026-03-25 17:04:58,952 - [date@j1] Running hyperparameter set 1/1 | lr=1e-05 | weight_decay=0.001 | mlp_dropout=0.3 | head_dropout=0.3 | self_attn_dropout=0.1 | compound_proj_dim=256 | ppi_fuse_setting=cat | head_fuse=cat | proj_feat=False
+2026-03-25 17:04:58,952 - ---- Start Training & Testing Fold 1 ----
+2026-03-25 17:04:58,953 - experiment 1 ...
+2026-03-25 17:04:58,955 - --- Executing CV with scaffold split with hyperparameters: use_struct=True, save_probs=False, seed=42 ...
+2026-03-25 17:04:58,955 - Dataset path -> datasets/cold_both_folds
+2026-03-25 17:04:59,008 - Excluded modalities: []
+2026-03-25 17:04:59,077 - Active modalities: ['esm', 'fegs', 'gae']
+2026-03-25 17:04:59,077 - Initialized model | excluded=None | mlp_dropout=0.3 | head_dropout=0.3 | self_attn_dropout=0.1 | join_attn_feat=both | compound_dim=850 | compound_proj_dim=256 | ppi_fuse_setting=cat | head_fuse=cat | proj_feat=False
+2026-03-25 17:05:32,342 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug train=False, aug eval=False
+2026-03-25 17:05:45,082 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug train=False, aug eval=False
+2026-03-25 17:05:52,724 - MolecularDataset hyperparamets -> dataset=dataset1, trategy=conditional, aug train=False, aug eval=False
+2026-03-25 17:06:00,180 - ---- train loader size -> 51606, val loader size 2718 ----
+2026-03-25 17:10:56,537 - NEW BEST @ epoch 1: train_auc=0.6624, val_auc=0.7765, val_aupr=0.4908, val_precision=0.2763, val_sensitivity=0.7947; val_specificity=0.5837

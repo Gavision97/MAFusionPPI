@@ -19,17 +19,11 @@ def get_args():
     parser.add_argument(
         "--eval_method",
         type=str,
-        default="cv_neg_smoo",
-        choices=["cv_cold", "cv", "cv_neg_smoo", "cold", "mcd"],
+        default="hyperparam_search",
+        choices=["cv_cold", "cv", "cv_neg_smoo", "cold", "mcd", "hyperparam_search"],
         help="evaluation method"
     )
-    parser.add_argument(
-        "--cv_method",
-        type=str,
-        default="all",
-        choices=["all", "per_fam"],
-        help="The split for 10-fold cross-validation - all data or per RNA subtype"
-    )
+
     parser.add_argument(
         "--neg_factor",
         type=str,

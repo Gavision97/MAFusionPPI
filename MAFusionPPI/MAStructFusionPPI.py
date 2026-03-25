@@ -51,6 +51,19 @@ def choose_model_setting(exclude_modalities=None, mlp_dropout=0.3, head_dropout=
     MAFusionPPI
         Initialized model with the specified configuration.
     """
+    logger.info(
+        f"Initialized model | "
+        f"excluded={exclude_modalities} | "
+        f"mlp_dropout={mlp_dropout} | "
+        f"head_dropout={head_dropout} | "
+        f"self_attn_dropout={self_attn_dropout} | "
+        f"join_attn_feat={join_attn_feat} | "
+        f"compound_dim={compound_dim} | "
+        f"compound_proj_dim={compound_proj_dim} | "
+        f"ppi_fuse_setting={ppi_fuse_setting} | "
+        f"head_fuse={head_fuse} | "
+        f"proj_feat={proj_feat}"
+    )
 
     model = MAFusionPPI(
         exclude_modalities=exclude_modalities,
@@ -65,19 +78,6 @@ def choose_model_setting(exclude_modalities=None, mlp_dropout=0.3, head_dropout=
         proj_feat=proj_feat
     )
 
-    logger.info(
-        f"Initialized model | "
-        f"excluded={exclude_modalities} | "
-        f"mlp_dropout={mlp_dropout} | "
-        f"head_dropout={head_dropout} | "
-        f"self_attn_dropout={self_attn_dropout} | "
-        f"join_attn_feat={join_attn_feat} | "
-        f"compound_dim={compound_dim} | "
-        f"compound_proj_dim={compound_proj_dim} | "
-        f"ppi_fuse_setting={ppi_fuse_setting} | "
-        f"head_fuse={head_fuse} | "
-        f"proj_feat={proj_feat}"
-    )
     return model
 
 
@@ -136,11 +136,11 @@ class MAFusionPPI(ABSMAFusionPPI):
 
         self.join_attn_proj_a = nn.Sequential(
             nn.Linear(in_features=compound_dim, out_features=compound_proj_dim),
-            nn.BatchNorm1d(compound_proj_dim)
+            nn.LayerNorm(compound_proj_dim)
         )
         self.join_attn_proj_b = nn.Sequential(
             nn.Linear(in_features=compound_dim, out_features=compound_proj_dim),
-            nn.BatchNorm1d(compound_proj_dim)
+            nn.LayerNorm(compound_proj_dim)
         )
    
         # ---------- Small molecule branch ----------
@@ -180,11 +180,11 @@ class MAFusionPPI(ABSMAFusionPPI):
         )
 
         self.smiles_mlp = nn.Sequential(
-            nn.Linear(256 * 3, 512),
+            nn.Linear(compound_proj_dim * 3, (compound_proj_dim * 3) // 2),
             nn.ReLU(),
-            nn.BatchNorm1d(512),
+            nn.BatchNorm1d((compound_proj_dim * 3) // 2),
             nn.Dropout(mlp_dropout),
-            nn.Linear(512, compound_proj_dim)
+            nn.Linear((compound_proj_dim * 3) // 2, compound_proj_dim)
         )
 
         if self.use_esm:
@@ -212,7 +212,7 @@ class MAFusionPPI(ABSMAFusionPPI):
 
         if self.use_fegs:
             if self.proj_feat:
-                self.esfegs_mlpm_ml = nn.Sequential(
+                self.fegs_mlp = nn.Sequential(
                     nn.Linear(578 + 578, compound_proj_dim),
                     nn.BatchNorm1d(compound_proj_dim)
             )
@@ -227,7 +227,7 @@ class MAFusionPPI(ABSMAFusionPPI):
 
         if self.use_gae:
             if self.proj_feat:
-                self.esfegs_mlpm_ml = nn.Sequential(
+                self.gae_mlp = nn.Sequential(
                     nn.Linear(500 + 500, compound_proj_dim),
                     nn.BatchNorm1d(compound_proj_dim)
             )
@@ -298,7 +298,7 @@ class MAFusionPPI(ABSMAFusionPPI):
         flatten_smiles_embed = smiles_embeddings.flatten(start_dim=1)
         smiles_embed = self.smiles_mlp(flatten_smiles_embed)
 
-        # ---------- PPI module ----------
+        ## PPI module ##
         ppi_tokens_emb = []
 
         if self.use_esm:
@@ -327,7 +327,10 @@ class MAFusionPPI(ABSMAFusionPPI):
             join_emb_a = self.join_attn_proj_a(ppi_omega_a_emb) # (B, 256, 722) - > (B, 256, compound_proj_dim)
             join_emb_b = self.join_attn_proj_b(ppi_omega_b_emb) # (B, 256, 722) - > (B, 256, compound_proj_dim)
 
-
+        ########################################################################################################################33
+        ## PPI Joint Attention Mechanism ;adapted from AttentionMGT-DTA by Hongjie Wu et al., ##
+        ## AttentionMGT-DTA GitHub -> https://github.com/JK-Liu7/AttentionMGT-DTA ##
+        
         #print(f'bpsf1 -> {join_emb_a.shape}, bpsf2 -> {join_emb_b.shape}') #  bpsf1 -> torch.Size([16, 256, 850]), bpsf2 -> torch.Size([16, 256, 850])
         inter_comp_prot = self.sigmoid(torch.einsum('bij,bkj->bik', self.W_p1(self.relu(join_emb_a)), self.W_p2(self.relu(join_emb_b))))
         #print(f'inter_comp_prot -> {inter_comp_prot.shape}') # inter_comp_prot -> torch.Size([16, 256, 256])
@@ -340,8 +343,9 @@ class MAFusionPPI(ABSMAFusionPPI):
         #print(cp_embedding.shape) # torch.Size([16, 256, 256, 850])
         cp_embedding = torch.einsum('bijk,bij->bk', cp_embedding, inter_comp_prot)
         #print(f'end, cp_embedding -> {cp_embedding.shape}') # end, cp_embedding -> torch.Size([16, 850]
+        ########################################################################################################################
 
-        # -------- PPI & Small molecule fusion module ---------- #
+        ## PPI & Small molecule fusion module ##
         # fuse PPI features -> sequence-based 1D & structure-based 3D
         # in all cases, final fused PPI embedding vector is (B, 256)
         if self.ppi_fuse_setting == 'cat':

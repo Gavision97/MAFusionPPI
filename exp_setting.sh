@@ -10,7 +10,7 @@
 #SBATCH --job-name research_project			### name of the job
 #SBATCH --output jobs/job-%J.out
 #SBATCH --error  jobs/job-%J.err
-#SBATCH --gpus=1				### number of GPUs, allocating more than 1 requires IT team's permission. Example to request 3090 gpu: #SBATCH --gpus=1
+#SBATCH --gpus=0				### number of GPUs, allocating more than 1 requires IT team's permission. Example to request 3090 gpu: #SBATCH --gpus=1
 
 # Note: the following 4 lines are commented out
 

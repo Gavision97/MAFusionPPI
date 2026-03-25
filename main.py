@@ -10,6 +10,7 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 import os
 import json
 import pickle
+import itertools
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -28,14 +29,14 @@ from evaluate.mcd_eval import mcd_eval
 PPI_DICT_PATH = 'saved_obj/ppi_dict.pkl'
 PPI_DFS_DICT_PATH = "saved_obj/enamine_ppi_dfs_dict.pkl"
 
-DATA_PATH = 'datasets/cold_both_folds'
+#DATA_PATH = 'datasets/cold_both_folds'
 #DATA_PATH = 'datasets/multi_ppimi_cold_both'
-#DATA_PATH = 'datasets/multi_ppimi_s4_tests_splits_with_my_train'
+DATA_PATH = 'datasets/multi_ppimi_s4_tests_splits_with_my_train'
 
 
 
-def hyperparam_serch(
-    res_file_name="cv_cold_results",
+def hyperparam_search(
+    res_file_name="hyperparam_search_result",
     save_probs=False,
     use_struct=True,
     strct_dataset="dataset1",
@@ -46,23 +47,117 @@ def hyperparam_serch(
     n=1,
     device="cuda",
     model_kwargs=None,
-    training_kwargs=None
-
+    training_kwargs=None,
+    hyperparam_kwargs=None
 ) -> None:
-    '''
-    we choose which features to leave -> w\o progress vector; then we choose join-attention
-    structure -> only ppiformer; then:
-    for inner_ppi_fuse in ['self_attn', 'cat', 'gat']:
-        for head_fuse in ['cat', 'gat']:
-            for hyperparam_set in hyperparameter_dict: (lr, weight_decay mlp_dropour, head_dropout...)
+    """
+    Run hyperparameter search for one job.
 
-    
-    
-    
-    
-    '''
-    pass
+    Each job receives a dictionary whose values are lists of candidate values.
+    The function expands that dictionary into concrete hyperparameter combinations,
+    runs one CV evaluation per combination, and appends the results to a CSV file.
 
+    Notes
+    -----
+    - Each combination triggers one call to `cv_cold_eval`.
+    - Each `cv_cold_eval` internally performs one evaluation over 5 folds.
+    - `hyperparam_kwargs` is expected to already represent only the subset
+      assigned to the current job.
+    """
+
+    if model_kwargs is None:
+        raise ValueError("model_kwargs must not be None")
+    if training_kwargs is None:
+        raise ValueError("training_kwargs must not be None")
+    if hyperparam_kwargs is None:
+        raise ValueError("hyperparam_kwargs must not be None")
+
+    keys = list(hyperparam_kwargs.keys())
+    values = [hyperparam_kwargs[k] for k in keys]
+
+    hyperparam_sets = [
+        dict(zip(keys, combo))
+        for combo in itertools.product(*values)
+    ]
+
+    logger.info(f"Job {job_id} started with {len(hyperparam_sets)} hyperparameter combinations")
+
+    res_path = os.path.join("results", "result_tables", "final_results")
+    os.makedirs(res_path, exist_ok=True)
+    summary_path = os.path.join(res_path, f"{res_file_name}.csv")
+    print(f'HYPERPARAM SEARCH - BEFORE LOOP')
+    for exp_idx, curr_set in enumerate(hyperparam_sets, start=1):
+        print(f'HYPERPARAM SEARCH - INSIDE THE LOOP')
+
+        current_model_kwargs = {
+            "exclude_modalities": model_kwargs["exclude_modalities"],
+            "mlp_dropout": curr_set["mlp_dropout"],
+            "head_dropout": curr_set["head_dropout"],
+            "self_attn_dropout": curr_set["self_attn_dropout"],
+            "join_attn_feat": model_kwargs["join_attn_feat"],
+            "compound_dim": model_kwargs["compound_dim"],
+            "compound_proj_dim": curr_set["compound_proj_dim"],
+            "ppi_fuse_setting": curr_set["ppi_fuse_setting"],
+            "head_fuse": curr_set["head_fuse"],
+            "proj_feat": curr_set["proj_feat"],
+        }
+
+        current_train_kwargs = {
+            "lr": curr_set["lr"],
+            "weight_decay": curr_set["weight_decay"],
+            "batch_size": training_kwargs["batch_size"]
+        }
+
+        logger.info(
+            f"[{job_id}] Running hyperparameter set {exp_idx}/{len(hyperparam_sets)} | "
+            f"lr={curr_set['lr']} | "
+            f"weight_decay={curr_set['weight_decay']} | "
+            f"mlp_dropout={curr_set['mlp_dropout']} | "
+            f"head_dropout={curr_set['head_dropout']} | "
+            f"self_attn_dropout={curr_set['self_attn_dropout']} | "
+            f"compound_proj_dim={curr_set['compound_proj_dim']} | "
+            f"ppi_fuse_setting={curr_set['ppi_fuse_setting']} | "
+            f"head_fuse={curr_set['head_fuse']} | "
+            f"proj_feat={curr_set['proj_feat']}"
+        )
+
+        res_dict, val_metrics_dict = cv_cold_eval(
+            use_struct=use_struct,
+            save_probs=save_probs,
+            strct_dataset=strct_dataset,
+            strct_strategy=strct_strategy,
+            strct_aug_train=strct_aug_train,
+            strct_aug_eval=strct_aug_eval,
+            n=n,
+            job_id=job_id,
+            device=device,
+            model_kwargs=current_model_kwargs,
+            train_kwargs=current_train_kwargs
+        )
+
+        hyperparameters_str = json.dumps(curr_set)
+
+        fold_keys = [f"fold{i}" for i in range(1, 6)]
+        row = {
+            "job_id": job_id,
+            "exp_in_job": exp_idx,
+            "hyperparameters": hyperparameters_str,
+            "val_res": json.dumps(val_metrics_dict or {}, default=list),
+        }
+
+        for fk in fold_keys:
+            row[fk] = json.dumps(res_dict.get(fk, []), default=list)
+
+        summary_df = pd.DataFrame([row])
+
+        if os.path.exists(summary_path):
+            existing_df = pd.read_csv(summary_path)
+            updated_df = pd.concat([existing_df, summary_df], ignore_index=True)
+        else:
+            updated_df = summary_df
+
+        updated_df.to_csv(summary_path, index=False)
+        logger.info(f"Saved/updated summary to: {summary_path}")
 
 def cv_cold_eval_(
     res_file_name="cv_cold_results",
@@ -265,7 +360,7 @@ def main():
     strct_dataset = args.strct_dataset # ["dataset1", "dataset2", "dataset3"]
     strct_strategy = args.strct_strategy # ["conditional", "full_mean", "subset_mean"]
     strct_aug_train = True if args.strct_aug_train == "True" else False
-    strct_aug_eval = False if args.strct_aug_eval == "False" else True
+    strct_aug_eval = True if args.strct_aug_eval == "True" else False
     
     epo_f1 = args.epo_f1
     epo_f2 = args.epo_f2
@@ -321,7 +416,22 @@ def main():
     if eval_method == "cold":
         nel = [epo_f1, epo_f2, epo_f3, epo_f4, epo_f5]
         train_test_cold_start_ppi(nel=nel, n=n_exp)
-
+    elif eval_method == "hyperparam_search":
+        hyperparam_search(
+          res_file_name=res_file_name,
+          save_probs=save_probs,
+          use_struct=use_struct,
+          strct_dataset=strct_dataset,
+          strct_strategy=strct_strategy,
+          strct_aug_train=strct_aug_train,
+          strct_aug_eval=strct_aug_eval,
+          job_id=job_id,
+          n=1,
+          device=device,
+          model_kwargs=model_kwargs,
+          training_kwargs=train_kwargs,
+          hyperparam_kwargs=hyperparameters_kwargs
+        )
     elif eval_method == "cv_neg_smoo":
         cold_neg_smoo_eval_(
             res_file_name=res_file_name,
