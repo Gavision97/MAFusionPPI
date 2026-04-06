@@ -353,9 +353,9 @@ class MAFusionPPI(ABSMAFusionPPI):
         elif self.ppi_fuse_setting == 'gate':
             ppi_embed = self.ppi_gate(cp_embedding, sequence_ppi_embeddings) # gated, already (B, 256)
         else: # self-attention fuse
-            ppi_emb = torch.stack([cp_embedding, sequence_ppi_embeddings], dim=1).to(device) 
-            ppi_emb = self.ppi_self_attention(ppi_emb)
-            ppi_emb = self.ppi_proj(ppi_emb.flatten(start_dim=1)) # flatten to (B, 256 *2) -> proj to (B, 256)
+            ppi_embed = torch.stack([cp_embedding, sequence_ppi_embeddings], dim=1).to(device) 
+            ppi_embed = self.ppi_self_attention(ppi_embed)
+            ppi_embed = self.ppi_proj(ppi_embed.flatten(start_dim=1)) # flatten to (B, 256 *2) -> proj to (B, 256)
 
         #print(f'PPI embeddings shape after fuse -> {ppi_embed.shape}') # PPI embeddings shape after cat -> torch.Size([16, 1618])
         

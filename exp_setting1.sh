@@ -6,10 +6,10 @@
 #SBATCH --job-name=hyperparam_search
 #SBATCH --output=jobs/job-%J.out
 #SBATCH --error=jobs/job-%J.err
-#SBATCH --gpus=rtx_4090:1
+#SBATCH --gpus=rtx_6000:1
 #SBATCH --mail-user=gavrilev@post.bgu.ac.il
 #SBATCH --mail-type=ALL
-#SBATCH --mem=24G
+#SBATCH --mem=48G
 ################################################################################################
 
 ############################
@@ -31,7 +31,7 @@ STRCT_AUG_EVAL="False"
 
 HEAD_DROPOUT=0.3
 JOIN_ATTN_FEAT="ppiformer"
-COMPOUND_DIM=128
+COMPOUND_DIM="128"
 HEAD_FUSE="cat"
 BATCH_SIZE=64
 
