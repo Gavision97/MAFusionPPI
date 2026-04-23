@@ -171,12 +171,17 @@ def cv_cold_eval_(
     n=10,
     device="cuda",
     model_kwargs=None,
+    training_kwargs=None,
 ) -> None:
     """
     Run cross-validation cold evaluation and append one summary row
     to results/result_tables/final_results/<res_file_name>.csv.
     """
-    model_kwargs = {} if model_kwargs is None else model_kwargs
+
+    if model_kwargs is None:
+        raise ValueError("model_kwargs must not be None")
+    if training_kwargs is None:
+        raise ValueError("training_kwargs must not be None")
 
     exp_name = job_id
     logger.info(f"--- Start Cold Start Experiments for Dataset -> {DATA_PATH} ---")
@@ -204,6 +209,7 @@ def cv_cold_eval_(
         job_id=job_id,
         device=device,
         model_kwargs=model_kwargs,
+        train_kwargs=training_kwargs
     )
 
     fold_keys = [f"fold{i}" for i in range(1, 6)]
@@ -245,11 +251,18 @@ def cold_neg_smoo_eval_(
     n=10,
     device="cuda",
     model_kwargs=None,
+    training_kwargs=None
 ) -> None:
     """
     Run cold negative-sampling / smoothing evaluation and append one
     summary row to results/result_tables/final_results/<res_file_name>.csv.
     """
+
+    if model_kwargs is None:
+        raise ValueError("model_kwargs must not be None")
+    if training_kwargs is None:
+        raise ValueError("training_kwargs must not be None")
+    
     model_kwargs = {} if model_kwargs is None else model_kwargs
 
     exp_name = f"dataset_neg_fct_{neg_factor}_smoo_fct_{smoo_factor}_{job_id}"
@@ -276,6 +289,7 @@ def cold_neg_smoo_eval_(
         job_id=job_id,
         device=device,
         model_kwargs=model_kwargs,
+        training_kwargs=training_kwargs
     )
 
     fold_keys = [f"fold{i}" for i in range(1, 6)]
@@ -307,6 +321,7 @@ def mcd_eval_(
     exp_name="Enamine",
     smiles_column="smiles",
     model_kwargs=None,
+    training_kwargs=None
 ):
     model_kwargs = {} if model_kwargs is None else model_kwargs
 
@@ -447,6 +462,7 @@ def main():
             n=n_exp,
             device=device,
             model_kwargs=model_kwargs,
+            training_kwargs=train_kwargs,
         )
 
     elif eval_method == "cv_cold":
@@ -462,6 +478,7 @@ def main():
             n=n_exp,
             device=device,
             model_kwargs=model_kwargs,
+            training_kwargs=train_kwargs,
         )
 
     elif eval_method == "mcd":

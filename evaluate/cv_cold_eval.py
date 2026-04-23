@@ -1,4 +1,5 @@
 import os
+os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
 import glob
 import logging
 logger = logging.getLogger(__name__) # get logger name
@@ -10,6 +11,7 @@ import torch.optim as optim
 
 
 from MAFusionPPI.MAFusionPPI import MAFusionPPI, MFusionPPI
+from MAFusionPPI.MAStructPPIWOStruct import choose_model_setting_wo_structure # for ablation study w/o structure
 from MAFusionPPI.MAStructFusionPPI import choose_model_setting
 from utils.tools import plot_train_val_auc, set_seed, preprocess_dataset
 
@@ -22,10 +24,10 @@ DATA_PATH = 'datasets/multi_ppimi_s4_tests_splits_with_my_train' # j3
 UNIPROT_MAPPING_PATH = 'datasets/idmapping_unip.tsv'
 
 # best hyperparameters; extracted from ablation study & vast hyperparameter search
-LR = 1e-5 # 0.00005
-WEIGHT_DECAY = 1e-3 # 0.001
-DROPOUT = 0.3
-BATCH_SIZE = 64
+#LR = 1e-5 # 0.00005
+#WEIGHT_DECAY = 1e-3 # 0.001
+#DROPOUT = 0.3
+#BATCH_SIZE = 64
 NUM_WORKERS = 6 
 MAX_N_EPOCHS = 1000 # max number of epochs for heldout evaluation with early stopping (default=500)
 
@@ -50,11 +52,13 @@ def hv_scaffold(model_kwargs=None, train_kwargs=None, use_struct=True,save_probs
 
     lr, weight_decay, batch_size = train_kwargs['lr'], train_kwargs['weight_decay'], train_kwargs['batch_size']
     # initialize model w or w/o strucure features
+
+
     if use_struct:
         model = choose_model_setting(**model_kwargs).to(device=device)
     else:
         train_df = preprocess_dataset(pd.read_csv(train_fp)) # drop 'ppi_id' column & duplicates
-        model = MFusionPPI().to(device=device)
+        model = choose_model_setting_wo_structure(**model_kwargs).to(device=device)
 
     best_model, best_val_metrics_dict, train_aucs, val_aucs = model.heldout_val_model(f"{job_id}_{fold}_{exp}", use_struct=use_struct, num_epochs=MAX_N_EPOCHS, dataset=train_df,
                                                                                       strct_dataset=strct_dataset, strct_strategy=strct_strategy, strct_aug_train=strct_aug_train, 
